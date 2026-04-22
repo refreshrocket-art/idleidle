@@ -1,26 +1,25 @@
 # Grand Line Idle
 
-Grand Line Idle is a complete solo idle/incremental RPG built for the browser. It uses a seafaring pirate anime-inspired world with familiar crew roles, island progression, automated combat, relic upgrades, and a prestige loop based on Pirate King fame.
+Grand Line Idle is a browser-based solo idle RPG with a seafaring pirate-anime theme. This updated version adds ship upgrades, a cleaner mobile UI, slower automated combat inspired by grindy MMORPG pacing, obtainable devil fruits, haki training, automation upgrades, and Pirate King prestige.
 
-## Features
+## Main Systems
 
-- Idle combat that continuously damages enemies and generates Belly passively.
-- Recruitable crew roster inspired by an iconic pirate team: captain, swordsman, navigator, sniper, cook, doctor, scholar, shipwright, musician, and helmsman.
-- Three main run resources: Belly, Bounty, and Treasure Relics.
-- Upgrade tiers for DPS, Belly gain, battle speed, relic gain, bounty gain, manual damage, and passive click automation.
-- Route progression across multiple seas and islands, from starter waters to a late-game futuristic island.
-- Prestige reset system that grants Pirate King Fame, which permanently multiplies future gains.
-- Visual feedback with animated ocean background, floating damage numbers, progress bars, and battle log updates.
-- Responsive HTML/CSS/JavaScript implementation with no build step required.
+- **Slow auto-battle loop**: the crew attacks on a measured swing timer instead of constant rapid DPS, which makes progression feel closer to long-form mob grinding.
+- **Crew progression**: train crew members based on classic pirate-anime roles.
+- **Ship upgrades**: improve the hull, sails, cannons, storage, and log pose using Belly.
+- **Devil fruits**: buy and equip fruits using Bounty.
+- **Haki training**: spend Bounty on Armament, Observation, and Conqueror’s Haki.
+- **Automation**: buy relic-powered idle systems for long runs.
+- **Prestige**: reset the voyage to gain Pirate King Fame for permanent multipliers.
+- **Responsive mobile UI**: includes a bottom tab bar for switching between panels on smaller screens.
 
-## How to Run
+## How To Run
 
-### Option 1: Open directly
-1. Open `grand-line-idle.html` in any modern browser.
-2. The game starts immediately.
+### Direct open
+Open `grand-line-idle.html` in a modern browser.
 
-### Option 2: Local static server
-If your browser has stricter local file rules, run a tiny local server:
+### Local server
+If direct file opening behaves oddly, use:
 
 ```bash
 cd grand-line-idle
@@ -29,35 +28,24 @@ python3 -m http.server 8000
 
 Then open `http://localhost:8000/grand-line-idle.html`.
 
-## How to Play
+## How To Play
 
-1. Use **Manual Strike** to speed up early kills.
-2. Spend **Belly** on crew levels.
-3. Spend **Treasure Relics** on automation and economy upgrades.
-4. Push to new routes when your highest Belly unlocks them.
-5. Build **Bounty** and deeper progression before using **Ascend Voyage**.
-6. Prestige for **Pirate King Fame** when the fame gain preview looks worthwhile.
+1. Start with manual strikes to speed up early kills.
+2. Spend Belly on crew training and ship upgrades.
+3. Spend Relics on automation systems.
+4. Spend Bounty on devil fruits and haki.
+5. Push new routes as your highest Belly rises.
+6. Prestige once the fame preview looks worthwhile.
 
-## Balancing Notes
+## Files
 
-- Early game is active for a few minutes, then transitions into stronger idle gains.
-- Midgame progression depends on relic upgrades and route unlocking.
-- Prestige becomes useful only after stacking several zones, bounty, and relics, so the game supports multiple hours of optimization and resets.
-
-## File Structure
-
-- `grand-line-idle.html` - Main game UI.
-- `assets/styles.css` - Theme, layout, and animation styling.
-- `assets/game.js` - Core game systems, combat loop, upgrades, progression, and rendering.
-
-## Modding Tips
-
-- Add more crew in the `crewData` array.
-- Add more routes in the `zones` array.
-- Add prestige layers or new resources by extending `state` and the render functions.
-- Add boss mechanics by modifying `rewardKill()` and `hitEnemy()`.
+- `grand-line-idle.html` - Main UI and layout.
+- `assets/styles.css` - Responsive styling and mobile tabs.
+- `assets/game.js` - Core combat, progression, fruits, haki, ship, and prestige systems.
+- `README.md` - Setup and overview.
 
 ## Notes
 
-- The game is session-based and does not save to localStorage because sandboxed browser environments often block it.
-- The Snapshot State button copies a JSON summary of the current run so it can be pasted elsewhere.
+- The game is session-based and does not save with localStorage.
+- The snapshot button copies the current run state to the clipboard.
+- Balance values are easy to tune in the JavaScript data arrays.
