@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Grand Line Idle</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,12 +10,10 @@
   <link rel="stylesheet" href="./assets/styles.css" />
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <canvas id="ocean"></canvas>
-
+  <canvas id="ocean" aria-hidden="true"></canvas>
   <div class="app-shell">
-    <header class="topbar glass">
-      <div class="brand-block">
+    <header class="topbar panel">
+      <div class="brand-row">
         <div class="logo-mark" aria-hidden="true">
           <svg viewBox="0 0 64 64">
             <path d="M10 43c10-17 34-29 44-23-8 4-12 10-12 18 0 7 4 12 11 14-11 4-34-3-43-8 5-1 9-4 10-8-2-1-6-2-10-2v-7c0-1 0-2 0-3Z" fill="currentColor"></path>
@@ -26,153 +24,141 @@
         <div>
           <p class="eyebrow">Solo idle pirate RPG</p>
           <h1>Grand Line Idle</h1>
-          <p class="subline">Slow-burn auto battles, crew growth, ship tuning, devil fruits, haki, and prestige.</p>
+          <p class="subtext">Slow auto-battles, ship growth, haki, devil fruits, and prestige.</p>
         </div>
       </div>
-      <div class="top-actions">
-        <button class="ghost-btn small-btn" type="button" id="snapshotBtn">Copy Snapshot</button>
-        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">☀</button>
+      <div class="topbar-actions">
+        <button class="ghost-btn" id="snapshotBtn" type="button">Copy Snapshot</button>
+        <button class="ghost-btn" id="themeBtn" type="button" aria-label="Toggle theme">☀</button>
       </div>
     </header>
 
-    <section class="resource-strip glass" id="resourceGrid"></section>
+    <section class="resource-grid" id="resourceGrid"></section>
 
-    <nav class="mobile-tabs glass" aria-label="Mobile sections">
-      <button class="tab-btn active" data-tab="battle" type="button">Battle</button>
-      <button class="tab-btn" data-tab="crew" type="button">Crew</button>
-      <button class="tab-btn" data-tab="ship" type="button">Ship</button>
-      <button class="tab-btn" data-tab="power" type="button">Power</button>
-      <button class="tab-btn" data-tab="prestige" type="button">Fame</button>
-    </nav>
-
-    <main id="main" class="dashboard-grid">
-      <section class="column major stack" data-panel="battle">
-        <article class="hero-card glass">
+    <main class="main-grid">
+      <section class="main-column stack">
+        <article class="panel hero-panel">
           <div>
-            <p class="eyebrow">Voyage status</p>
+            <p class="eyebrow">Current route</p>
             <h2 id="zoneName">Foosha Village Coast</h2>
-            <p id="zoneFlavor" class="muted">A rough shoreline full of low-level bandits and small gains.</p>
+            <p class="subtext" id="zoneFlavor">Starter waters with weak enemies and small payouts.</p>
           </div>
-          <div class="hero-metrics">
-            <div class="metric-box"><span>Auto swing</span><strong id="attackTempo">2.80s</strong></div>
-            <div class="metric-box"><span>Damage / swing</span><strong id="swingDamage">0</strong></div>
-            <div class="metric-box"><span>Unlock req.</span><strong id="zoneReq">Starter Sea</strong></div>
+          <div class="hero-stats">
+            <div class="mini-card"><span>Auto swing</span><strong id="attackTempo">2.80s</strong></div>
+            <div class="mini-card"><span>Swing damage</span><strong id="swingDamage">0</strong></div>
+            <div class="mini-card"><span>Unlock req</span><strong id="zoneReq">Starter Sea</strong></div>
           </div>
         </article>
 
-        <article class="glass card battle-card">
-          <div class="section-head">
+        <article class="panel battle-panel">
+          <div class="section-header">
             <div>
               <p class="eyebrow">Encounter</p>
               <h3 id="enemyName">Coast Bandit</h3>
             </div>
-            <div class="pill" id="enemyTier">Tier I</div>
+            <div class="chip" id="enemyTier">Tier 1</div>
           </div>
 
-          <div class="combat-layout">
+          <div class="battle-layout">
             <div class="enemy-portrait" id="enemyPortrait" aria-hidden="true"></div>
-            <div class="combat-info">
-              <div class="stat-line"><span>HP</span><strong id="enemyHp">0 / 0</strong></div>
-              <div class="bar hp-bar"><div id="enemyHpBar"></div></div>
-              <div class="stat-line"><span>Attack cycle</span><strong id="attackCycle">0%</strong></div>
-              <div class="bar cast-bar"><div id="attackBar"></div></div>
-              <div class="stat-line"><span>Crew damage</span><strong id="crewDamage">0</strong></div>
-              <div class="stat-line"><span>Manual strike</span><strong id="manualDamage">0</strong></div>
+            <div class="battle-stats">
+              <div class="row-between"><span>HP</span><strong id="enemyHp">0 / 0</strong></div>
+              <div class="bar"><div id="enemyHpBar"></div></div>
+              <div class="row-between"><span>Auto attack</span><strong id="attackCycle">0%</strong></div>
+              <div class="bar cast"><div id="attackBar"></div></div>
+              <div class="grid-two">
+                <div class="stat-box"><span>Crew</span><strong id="crewDamage">0</strong></div>
+                <div class="stat-box"><span>Manual</span><strong id="manualDamage">0</strong></div>
+              </div>
             </div>
           </div>
 
-          <div class="action-row">
+          <div class="button-row">
             <button class="primary-btn" id="manualAttackBtn" type="button">Manual Strike</button>
             <button class="secondary-btn" id="nextZoneBtn" type="button">Advance Route</button>
             <button class="ghost-btn" id="prevZoneBtn" type="button">Previous Route</button>
           </div>
 
-          <div class="battle-log" id="battleLog" aria-live="polite"></div>
+          <div class="log-box" id="battleLog" aria-live="polite"></div>
         </article>
 
-        <article class="glass card milestone-card">
-          <div class="section-head">
+        <article class="panel section-panel">
+          <div class="section-header">
             <div>
-              <p class="eyebrow">Long grind goals</p>
-              <h3>Voyage milestones</h3>
+              <p class="eyebrow">Voyage goals</p>
+              <h3>Milestones</h3>
             </div>
           </div>
           <ul class="milestone-list" id="milestoneList"></ul>
         </article>
       </section>
 
-      <section class="column side stack" data-panel="crew">
-        <article class="glass card">
-          <div class="section-head">
+      <aside class="side-column stack">
+        <article class="panel section-panel">
+          <div class="section-header">
             <div>
-              <p class="eyebrow">Crew roster</p>
+              <p class="eyebrow">Crew</p>
               <h3>Recruit and train</h3>
             </div>
-            <div class="pill" id="crewPower">Power 0</div>
+            <div class="chip" id="crewPower">Power 0</div>
           </div>
-          <div class="list-grid" id="crewGrid"></div>
+          <div class="card-list" id="crewGrid"></div>
         </article>
-      </section>
 
-      <section class="column side stack" data-panel="ship">
-        <article class="glass card">
-          <div class="section-head">
+        <article class="panel section-panel">
+          <div class="section-header">
             <div>
-              <p class="eyebrow">Ship upgrades</p>
+              <p class="eyebrow">Ship</p>
               <h3>Hull, sails, cannons</h3>
             </div>
-            <div class="pill accent" id="shipPower">Ship 0</div>
+            <div class="chip gold" id="shipPower">Ship 0</div>
           </div>
-          <div class="list-grid" id="shipGrid"></div>
+          <div class="card-list" id="shipGrid"></div>
         </article>
-      </section>
 
-      <section class="column side stack" data-panel="power">
-        <article class="glass card">
-          <div class="section-head">
+        <article class="panel section-panel">
+          <div class="section-header">
             <div>
               <p class="eyebrow">Devil fruits</p>
-              <h3>Obtain and equip powers</h3>
+              <h3>Obtain and equip</h3>
             </div>
-            <div class="pill" id="equippedFruit">No Fruit</div>
+            <div class="chip" id="equippedFruit">No Fruit</div>
           </div>
-          <div class="list-grid" id="fruitGrid"></div>
+          <div class="card-list" id="fruitGrid"></div>
         </article>
 
-        <article class="glass card">
-          <div class="section-head">
+        <article class="panel section-panel">
+          <div class="section-header">
             <div>
-              <p class="eyebrow">Haki training</p>
+              <p class="eyebrow">Haki</p>
               <h3>Permanent combat arts</h3>
             </div>
           </div>
-          <div class="list-grid" id="hakiGrid"></div>
+          <div class="card-list" id="hakiGrid"></div>
         </article>
-      </section>
 
-      <section class="column side stack" data-panel="prestige">
-        <article class="glass card">
-          <div class="section-head">
+        <article class="panel section-panel">
+          <div class="section-header">
             <div>
               <p class="eyebrow">Automation</p>
               <h3>Idle systems</h3>
             </div>
           </div>
-          <div class="list-grid" id="upgradeList"></div>
+          <div class="card-list" id="upgradeList"></div>
         </article>
 
-        <article class="glass card">
-          <div class="section-head">
+        <article class="panel section-panel">
+          <div class="section-header">
             <div>
-              <p class="eyebrow">Pirate King prestige</p>
+              <p class="eyebrow">Prestige</p>
               <h3>Ascend voyage</h3>
             </div>
-            <div class="pill accent">Permanent fame</div>
+            <div class="chip gold">Permanent fame</div>
           </div>
-          <p class="muted" id="prestigeText"></p>
-          <button class="warning-btn" id="prestigeBtn" type="button">Ascend Voyage</button>
+          <p class="subtext" id="prestigeText"></p>
+          <button class="warning-btn full-width" id="prestigeBtn" type="button">Ascend Voyage</button>
         </article>
-      </section>
+      </aside>
     </main>
   </div>
 
