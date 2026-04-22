@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grand Tide Idle — Pirate Idle RPG</title>
+  <style>
+    :root{
+      --bg:#0c1024;
+      --panel:#141b39;
+      --panel2:#1b2550;
+      --soft:#252f66;
+      --text:#edf2ff;
+      --muted:#a8b3db;
+      --accent:#7cd8ff;
+      --accent2:#c28cff;
+      --gold:#ffd86f;
+      --danger:#ff7f9f;
+      --good:#85f0a7;
+      --epic:#be8cff;
+      --legendary:#ffb25f;
+      --rare:#66d4ff;
+      --normal:#cfd8ff;
+      --shadow:0 12px 30px rgba(0,0,0,.28);
+      --radius:18px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at top, rgba(124,216,255,.14), transparent 25%),
+        radial-gradient(circle at right, rgba(194,140,255,.12), transparent 22%),
+        linear-gradient(180deg,#0b1023,#090d19 60%,#06080f);
+      color:var(--text);
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      min-width:375px;
+    }
+    button,select{
+      font:inherit;
+      border:none;
+      border-radius:14px;
+      padding:.7rem .9rem;
+      color:var(--text);
+      background:linear-gradient(180deg,var(--soft),#1b2142);
+      box-shadow:var(--shadow);
+    }
+    button{cursor:pointer}
+    button:hover{filter:brightness(1.08)}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    .app{
+      max-width:1320px;
+      margin:0 auto;
+      padding:10px;
+      display:grid;
+      gap:10px;
+      grid-template-columns:280px minmax(0,1fr) 280px;
+      align-items:start;
+    }
+    .panel{
+      background:linear-gradient(180deg,rgba(24,32,68,.92),rgba(13,18,39,.95));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .panel .hd{
+      padding:12px 14px;
+      font-weight:700;
+      letter-spacing:.02em;
+      background:linear-gradient(90deg,rgba(124,216,255,.16),rgba(194,140,255,.1));
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .panel .bd{padding:10px}
+    .heroTitle{
+      display:flex;align-items:center;gap:10px;
+      padding:12px 12px 6px;
+    }
+    .avatar{
+      width:50px;height:50px;border-radius:16px;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg,rgba(124,216,255,.3),rgba(194,140,255,.35));
+      font-size:1.9rem;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),var(--shadow);
+    }
+    .sub{color:var(--muted);font-size:.92rem}
+    .currency{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+    .pill{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;padding:8px 10px;
+    }
+    .statGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+    .stat{background:rgba(255,255,255,.05);padding:8px;border-radius:12px}
+    .barWrap{margin:8px 0 12px}
+    .labelRow,.tinyRow{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .tinyRow{font-size:.85rem;color:var(--muted)}
+    .bar{height:11px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-top:6px}
+    .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%}
+    .hp{background:linear-gradient(90deg,#ff8fa4,#ff5f86)}
+    .mana{background:linear-gradient(90deg,#7cd8ff,#5ca9ff)}
+    .enemyCard,.zoneCard,.eidolonCard,.questCard,.item,.skillCard,.dungeonCard,.shopCard{
+      background:rgba(255,255,255,.055);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      padding:10px;
+      margin-bottom:8px;
+    }
+    .enemyArt,.zoneArt{font-size:2rem}
+    .badge{font-size:.76rem;padding:.22rem .45rem;border-radius:999px;background:rgba(255,255,255,.08);color:var(--muted);display:inline-block}
+    .badge.active{background:rgba(124,216,255,.18);color:var(--accent)}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .tabs{display:flex;gap:6px;flex-wrap:wrap;padding:0 10px 10px;position:sticky;top:0;background:rgba(9,13,25,.96);backdrop-filter:blur(8px);z-index:5}
+    .tab{background:rgba(255,255,255,.05);padding:.58rem .78rem;border-radius:12px;font-size:.9rem;box-shadow:none}
+    .tab.active{background:linear-gradient(180deg,rgba(124,216,255,.24),rgba(194,140,255,.18));border:1px solid rgba(255,255,255,.1)}
+    .tabview{display:none}
+    .tabview.active{display:block}
+    .log{max-height:200px;overflow:auto;font-size:.84rem;display:flex;flex-direction:column-reverse;gap:6px}
+    .log div{padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.045);color:#dbe5ff}
+    .inventory{display:grid;grid-template-columns:1fr;gap:10px}
+    .item{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    .rarity-normal{color:var(--normal)}
+    .rarity-rare{color:var(--rare)}
+    .rarity-epic{color:var(--epic)}
+    .rarity-legendary{color:var(--legendary)}
+    .muted{color:var(--muted)}
+    .small{font-size:.78rem}
+    .bigNum{font-size:1.02rem;font-weight:800;line-height:1.15}
+    .overlay{
+      position:fixed;inset:0;background:rgba(7,9,18,.82);backdrop-filter:blur(10px);
+      display:flex;align-items:center;justify-content:center;padding:14px;z-index:40;
+    }
+    .creator{
+      width:min(1100px,100%);
+      background:linear-gradient(180deg,#161f44,#0f1530);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+    .classGrid,.eidolonGrid,.zoneGrid,.skillGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+    .classCard,.eidolonPick{
+      padding:14px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);cursor:pointer;
+      min-height:160px;
+    }
+    .classCard.selected,.eidolonPick.selected{outline:2px solid rgba(124,216,255,.7);background:rgba(124,216,255,.1)}
+    h1,h2,h3,p{margin:.2rem 0}
+    .footerActions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:14px}
+    .kpiGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .kpi{padding:10px;background:rgba(255,255,255,.05);border-radius:14px;text-align:center}
+    .eqGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .equipSlot{padding:10px;border-radius:14px;background:rgba(255,255,255,.05)}
+    .inlineProgress{height:8px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-top:8px}
+    .inlineProgress>div{height:100%;background:linear-gradient(90deg,var(--gold),#ff8d66);width:0%}
+    .notice{padding:8px 10px;border-radius:12px;background:rgba(124,216,255,.1);border:1px solid rgba(124,216,255,.2);margin-bottom:8px;font-size:.86rem}
+    .danger{background:rgba(255,127,159,.1);border:1px solid rgba(255,127,159,.18)}
+    .green{background:rgba(133,240,167,.1);border:1px solid rgba(133,240,167,.18)}
+    @media (max-width:1080px){
+      .app{grid-template-columns:1fr}
+    }
+    @media (max-width:640px){
+      .currency,.statGrid,.eqGrid,.kpiGrid{grid-template-columns:1fr}
+      .heroTitle{padding-bottom:0}
+      .tabs{position:sticky;top:0;background:rgba(9,13,25,.96);backdrop-filter:blur(8px);z-index:5;padding-top:10px}
+      .creator{padding:14px}
+    }
+  </style>
+</head>
+<body>
+<div id="creatorOverlay" class="overlay"></div>
+<div class="app">
+  <section class="panel" id="leftPanel"></section>
+  <main class="panel">
+    <div class="hd"><span>🏴‍☠️ Grand Tide Idle</span><span class="small muted">One Piece-inspired solo browser idle RPG</span></div>
+    <div class="tabs" id="tabs"></div>
+    <div class="bd">
+      <div id="view-battle" class="tabview active"></div>
+      <div id="view-skills" class="tabview"></div>
+      <div id="view-gear" class="tabview"></div>
+      <div id="view-shop" class="tabview"></div>
+      <div id="view-dungeons" class="tabview"></div>
+      <div id="view-quests" class="tabview"></div>
+      <div id="view-prestige" class="tabview"></div>
+    </div>
+  </main>
+  <aside class="panel" id="rightPanel"></aside>
+</div>
+<script>
+(() => {
+  const SAVE_KEY = 'grandTideIdleSaveV2';
+  const AUTO_SAVE_MS = 30000;
+  const TICK_MS = 400;
+  const OFFLINE_CAP_MS = 8 * 60 * 60 * 1000;
+
+  const CLASSES = {
+    Duelist: {
+      icon:'⚔️', desc:'Fast dual-blade striker. Builds combo quickly and crits often.',
+      bonuses:{attack:1.18, speed:1.12, crit:0.07, hp:1.0, mana:1.0, gold:1.0},
+      skillFlavor:['Blade Tempest','Phantom Cut','Combo Surge']
+    },
+    Wizard: {
+      icon:'🪄', desc:'Elemental caster with high mana and spell burst.',
+      bonuses:{attack:1.12, speed:0.98, crit:0.04, hp:0.95, mana:1.28, gold:1.0},
+      skillFlavor:['Meteor Veil','Frost Sigil','Arcane Overflow']
+    },
+    Bard: {
+      icon:'🎵', desc:'Support caster that sustains, buffs, and profits from long runs.',
+      bonuses:{attack:0.98, speed:1.02, crit:0.03, hp:1.08, mana:1.18, gold:1.12},
+      skillFlavor:['Song of Dawn','Resonant Echo','Encore Blessing']
+    },
+    Ravager: {
+      icon:'🪓', desc:'Heavy axe bruiser with huge crit damage and boss pressure.',
+      bonuses:{attack:1.24, speed:0.93, crit:0.05, hp:1.16, mana:0.9, gold:1.0},
+      skillFlavor:['World Breaker','Savage Arc','Blood Oath']
+    },
+    Guardian: {
+      icon:'🛡️', desc:'Defensive fighter with high HP, block, and safer dungeon clears.',
+      bonuses:{attack:1.0, speed:0.95, crit:0.02, hp:1.32, mana:1.0, gold:1.02},
+      skillFlavor:['Shield Nova','Bulwark','Radiant Guard']
+    }
+  };
+
+  const EIDOLONS = {
+    Aylin:{icon:'🦋', desc:'Wind spirit of swift blessings.', buffs:{speed:0.12, dodge:0.04, attack:0.06}, active:'Gale Kiss'},
+    Seraphis:{icon:'🔥', desc:'Flame eidolon that empowers burst damage.', buffs:{attack:0.14, crit:0.04, fire:0.12}, active:'Phoenix Ray'},
+    Luminia:{icon:'✨', desc:'Light eidolon that heals and enriches idle gains.', buffs:{gold:0.12, hp:0.12, mana:0.08}, active:'Grace of Stars'},
+    Noctis:{icon:'🌙', desc:'Shadow eidolon specializing in boss slaying.', buffs:{boss:0.18, crit:0.05, attack:0.08}, active:'Night Rend'}
+  };
+
+  const ZONES = [
+    {name:'Navea Plains', icon:'🏰', level:1, enemyPool:[['Poro Slime','🫧'],['Training Sprite','🧚'],['Forest Wolf','🐺']], elements:['wind','light'], gold:1, exp:1, dungeon:'Whispering Ruins'},
+    {name:'Helonia Coast', icon:'🌊', level:8, enemyPool:[['Tidal Crab','🦀'],['Coral Manta','🐟'],['Salt Marauder','🦈']], elements:['water','ice'], gold:1.35, exp:1.35, dungeon:'Abyssal Tidecave'},
+    {name:'Triatio Highlands', icon:'⛰️', level:16, enemyPool:[['Stonefang Boar','🐗'],['Highland Golem','🪨'],['Storm Hawk','🦅']], elements:['earth','lightning'], gold:1.8, exp:1.9, dungeon:'Thunderpeak Bastion'},
+    {name:'Star Sand Desert', icon:'🏜️', level:25, enemyPool:[['Sunscale Lizard','🦎'],['Dune Revenant','💀'],['Mirage Djinn','🌀']], elements:['fire','wind'], gold:2.45, exp:2.55, dungeon:'Scorchglass Sanctum'},
+    {name:'Demarech Mines', icon:'⛏️', level:38, enemyPool:[['Crystal Spider','🕷️'],['Ore Devourer','🪲'],['Tunnel Horror','👹']], elements:['earth','dark'], gold:3.3, exp:3.45, dungeon:'Obsidian Drillcore'},
+    {name:'Chrono Spire', icon:'🕰️', level:52, enemyPool:[['Time Wisp','🧿'],['Clockwork Knight','🤖'],['Void Harrier','🦇']], elements:['light','dark'], gold:4.7, exp:4.95, dungeon:'Eclipse Throne'}
+  ];
+
+  const DUNGEONS = [
+    {name:'Whispering Ruins', zone:'Navea Plains', req:4, duration:45, boss:'Ancient Treant', icon:'🌿', rewardScale:1.2},
+    {name:'Abyssal Tidecave', zone:'Helonia Coast', req:12, duration:60, boss:'Leviathan Spawn', icon:'🌀', rewardScale:1.5},
+    {name:'Thunderpeak Bastion', zone:'Triatio Highlands', req:20, duration:75, boss:'Volt Tyrant', icon:'⚡', rewardScale:1.9},
+    {name:'Scorchglass Sanctum', zone:'Star Sand Desert', req:30, duration:90, boss:'Solis Wyrm', icon:'🔥', rewardScale:2.35},
+    {name:'Obsidian Drillcore', zone:'Demarech Mines', req:42, duration:100, boss:'Molten Juggernaut', icon:'⛓️', rewardScale:2.85},
+    {name:'Eclipse Throne', zone:'Chrono Spire', req:56, duration:120, boss:'Astral Sovereign', icon:'🌘', rewardScale:3.5}
+  ];
+
+  const SKILL_NODES = [
+    {id:'atk1', name:'Weapon Mastery', max:10, desc:'+6% attack per rank.', cost:1, apply:(g,rank)=>g.bonus.attack *= (1 + rank*0.06)},
+    {id:'hp1', name:'Vital Current', max:8, desc:'+8% max HP per rank.', cost:1, apply:(g,rank)=>g.bonus.hp *= (1 + rank*0.08)},
+    {id:'speed1', name:'Quickstep', max:8, desc:'+5% attack speed per rank.', cost:1, apply:(g,rank)=>g.bonus.speed *= (1 + rank*0.05)},
+    {id:'crit1', name:'Edge Instinct', max:6, desc:'+2% crit chance per rank.', cost:1, apply:(g,rank)=>g.bonus.crit += rank*0.02},
+    {id:'eid1', name:'Eidolon Bond', max:8, desc:'+7% eidolon damage per rank.', cost:1, apply:(g,rank)=>g.bonus.eidolon *= (1 + rank*0.07)},
+    {id:'gold1', name:'Treasure Sense', max:10, desc:'+6% gold gains per rank.', cost:1, apply:(g,rank)=>g.bonus.gold *= (1 + rank*0.06)},
+    {id:'elem1', name:'Elemental Lore', max:6, desc:'+7% elemental damage per rank.', cost:1, apply:(g,rank)=>g.bonus.elemental *= (1 + rank*0.07)},
+    {id:'boss1', name:'Boss Hunter', max:6, desc:'+9% boss damage per rank.', cost:1, apply:(g,rank)=>g.bonus.boss *= (1 + rank*0.09)},
+    {id:'gaia1', name:'Gaia Affinity', max:5, desc:'+5% Gaia Emblem gain chance per rank.', cost:1, apply:(g,rank)=>g.bonus.gaiaChance += rank*0.05}
+  ];
+
+  const QUESTS = [
+    {id:'q1', name:'First Steps in Navea', goalType:'kills', target:15, reward:{gold:120, gaia:2}, text:'Defeat 15 enemies.'},
+    {id:'q2', name:'A Friend Beside You', goalType:'eidolonLevel', target:5, reward:{gold:180, gaia:3}, text:'Raise your Eidolon to Lv. 5.'},
+    {id:'q3', name:'Secrets of the Envoy', goalType:'skillSpend', target:5, reward:{gold:240, gaia:5}, text:'Spend 5 skill points.'},
+    {id:'q4', name:'Well Equipped', goalType:'equipPower', target:45, reward:{gold:500, gaia:6}, text:'Reach 45 equipment power.'},
+    {id:'q5', name:'Tidebreaker', goalType:'zone', target:1, reward:{gold:700, gaia:8}, text:'Unlock Helonia Coast.'},
+    {id:'q6', name:'Dungeon Diver', goalType:'dungeonClears', target:3, reward:{gold:1000, gaia:10}, text:'Clear 3 dungeons.'},
+    {id:'q7', name:'Soul Reforged', goalType:'rebirths', target:1, reward:{gold:0, gaia:15}, text:'Perform your first Rebirth.'}
+  ];
+
+  const RARITIES = [
+    {name:'Normal', color:'normal', mult:1, chance:0.62},
+    {name:'Rare', color:'rare', mult:1.35, chance:0.24},
+    {name:'Epic', color:'epic', mult:1.82, chance:0.11},
+    {name:'Legendary', color:'legendary', mult:2.45, chance:0.03}
+  ];
+
+  const EQUIP_TYPES = [
+    {slot:'weapon', names:['Twin Blades','Arc Staff','Battle Harp','Titan Axe','Aegis Sword'], stat:'attack', scale:7},
+    {slot:'armor', names:['Battlecoat','Mystic Robe','Echo Raiment','Warplate','Knight Mail'], stat:'hp', scale:34},
+    {slot:'accessory', names:['Sigil Ring','Moon Charm','Storm Band','Gaia Pendant','Eidolon Brooch'], stat:'mana', scale:15}
+  ];
+
+  const DEFAULT_STATE = () => ({
+    created:false,
+    name:'Envoy',
+    className:'Duelist',
+    zoneIndex:0,
+    autoDungeon:true,
+    autoEquip:true,
+    skillRanks:{},
+    questsClaimed:{},
+    stats:{
+      level:1, exp:0, gold:0, gaia:0, rebirths:0, rebirthEssence:0,
+      kills:0, dungeonClears:0, skillSpent:0
+    },
+    combat:{
+      hp:100, mana:50, enemy:null, combo:0, lastHit:0,
+      skillCd:0, eidolonCd:0, dpsWindow:0, dpsDamage:0
+    },
+    player:{
+      attack:12, hp:100, mana:50, speed:1, crit:0.05, critDamage:1.7,
+      goldMult:1, elemental:'wind', elementBonus:{fire:0,water:0,ice:0,earth:0,wind:0,light:0,dark:0,lightning:0}
+    },
+    eidolon:{name:'Aylin', level:1, exp:0},
+    inventory:[],
+    equipment:{weapon:null, armor:null, accessory:null},
+    dungeon:{active:false, index:0, timeLeft:0, bossHp:0, bossMaxHp:0, manualBursts:0},
+    lastSave:Date.now(),
+    unlockedZones:[0]
+  });
+
+  class Game {
+    constructor() {
+      this.state = this.load();
+      this.currentTab = 'battle';
+      this.logs = [];
+      this.bonus = {};
+      this.refreshDerived();
+      this.renderShell();
+      this.renderAll();
+      this.showCreatorIfNeeded();
+      this.applyOfflineProgress();
+      this.start();
+    }
+
+    load() {
+      try {
+        const raw = localStorage.getItem(SAVE_KEY);
+        if (!raw) return DEFAULT_STATE();
+        const parsed = JSON.parse(raw);
+        return Object.assign(DEFAULT_STATE(), parsed, {
+          stats:Object.assign(DEFAULT_STATE().stats, parsed.stats || {}),
+          combat:Object.assign(DEFAULT_STATE().combat, parsed.combat || {}),
+          player:Object.assign(DEFAULT_STATE().player, parsed.player || {}),
+          eidolon:Object.assign(DEFAULT_STATE().eidolon, parsed.eidolon || {}),
+          equipment:Object.assign(DEFAULT_STATE().equipment, parsed.equipment || {}),
+          dungeon:Object.assign(DEFAULT_STATE().dungeon, parsed.dungeon || {}),
+          skillRanks:Object.assign({}, parsed.skillRanks || {}),
+          questsClaimed:Object.assign({}, parsed.questsClaimed || {}),
+          unlockedZones: parsed.unlockedZones || [0],
+          inventory: parsed.inventory || []
+        });
+      } catch {
+        return DEFAULT_STATE();
+      }
+    }
+
+    save() {
+      this.state.lastSave = Date.now();
+      localStorage.setItem(SAVE_KEY, JSON.stringify(this.state));
+      this.flashLog('💾 Progress saved to localStorage.');
+    }
+
+    hardReset() {
+      localStorage.removeItem(SAVE_KEY);
+      this.state = DEFAULT_STATE();
+      this.logs = ['🗑️ Save erased. Begin a new destiny.'];
+      this.refreshDerived();
+      this.renderAll();
+      this.showCreatorIfNeeded();
+    }
+
+    start() {
+      this.ensureEnemy();
+      this.tickHandle = setInterval(() => this.tick(TICK_MS / 1000), TICK_MS);
+      this.saveHandle = setInterval(() => this.save(), AUTO_SAVE_MS);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) this.applyOfflineProgress();
+      });
+      window.addEventListener('beforeunload', () => this.save());
+    }
+
+    showCreatorIfNeeded() {
+      const overlay = document.getElementById('creatorOverlay');
+      if (!this.state.created) {
+        overlay.style.display = 'flex';
+        let selectedClass = this.state.className || 'Duelist';
+        let selectedEidolon = this.state.eidolon.name || 'Aylin';
+        const render = () => {
+          overlay.innerHTML = `
+            <div class="creator">
+              <div class="notice">🌟 Build your anime hero, choose a class, and bind your first Eidolon. Everything runs entirely in this one file — offline-ready after load.</div>
+              <h1>Astra Eidolon Idle</h1>
+              <p class="sub">Aura Kingdom-inspired solo idle RPG with offline progress, dungeons, gear, quests, and rebirth progression.</p>
+              <div class="row" style="margin:12px 0 16px">
+                <input id="heroName" value="${this.escape(this.state.name)}" maxlength="18" placeholder="Hero name" style="flex:1;min-width:220px;padding:.85rem 1rem;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:var(--text);font:inherit">
+              </div>
+              <h2>Choose Your Class</h2>
+              <div class="classGrid">
+                ${Object.entries(CLASSES).map(([name,data]) => `
+                  <div class="classCard ${selectedClass===name?'selected':''}" data-class="${name}">
+                    <div class="bigNum">${data.icon} ${name}</div>
+                    <p class="sub">${data.desc}</p>
+                    <p class="small">ATK x${data.bonuses.attack.toFixed(2)} · HP x${data.bonuses.hp.toFixed(2)} · SPD x${data.bonuses.speed.toFixed(2)}</p>
+                    <p class="small muted">Signature skills: ${data.skillFlavor.join(', ')}</p>
+                  </div>
+                `).join('')}
+              </div>
+              <h2 style="margin-top:12px">Choose Your Eidolon</h2>
+              <div class="eidolonGrid">
+                ${Object.entries(EIDOLONS).map(([name,data]) => `
+                  <div class="eidolonPick ${selectedEidolon===name?'selected':''}" data-eidolon="${name}">
+                    <div class="bigNum">${data.icon} ${name}</div>
+                    <p class="sub">${data.desc}</p>
+                    <p class="small">${data.active} · ${Object.entries(data.buffs).map(([k,v]) => `+${Math.round(v*100)}% ${k}`).join(' · ')}</p>
+                  </div>
+                `).join('')}
+              </div>
+              <div class="footerActions">
+                <button id="beginAdventure">Begin Adventure ✨</button>
+              </div>
+            </div>`;
+          overlay.querySelectorAll('[data-class]').forEach(el => el.onclick = () => {selectedClass = el.dataset.class; render();});
+          overlay.querySelectorAll('[data-eidolon]').forEach(el => el.onclick = () => {selectedEidolon = el.dataset.eidolon; render();});
+          overlay.querySelector('#beginAdventure').onclick = () => {
+            const n = overlay.querySelector('#heroName').value.trim() || 'Envoy';
+            this.state.created = true;
+            this.state.name = n;
+            this.state.className = selectedClass;
+            this.state.eidolon.name = selectedEidolon;
+            this.fullRecover();
+            this.refreshDerived();
+            overlay.style.display = 'none';
+            this.flashLog(`✨ ${n} the ${selectedClass} sets out with ${selectedEidolon}!`);
+            this.save();
+            this.renderAll();
+          };
+        };
+        render();
+      } else {
+        overlay.style.display = 'none';
+      }
+    }
+
+    escape(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
+
+    flashLog(text) {
+      this.logs.unshift(`${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} · ${text}`);
+      this.logs = this.logs.slice(0, 80);
+      this.renderRight();
+    }
+
+    renderShell() {
+      const tabs = [
+        ['battle','⚔️ Battle'], ['skills','🌿 Skills'], ['gear','🎒 Gear'], ['shop','🏪 Shop'], ['dungeons','🏛️ Dungeons'], ['quests','📜 Quests'], ['prestige','♾️ Rebirth']
+      ];
+      const tabsEl = document.getElementById('tabs');
+      tabsEl.innerHTML = tabs.map(([id,label]) => `<button class="tab ${this.currentTab===id?'active':''}" data-tab="${id}">${label}</button>`).join('');
+      tabsEl.querySelectorAll('[data-tab]').forEach(btn => btn.onclick = () => {
+        this.currentTab = btn.dataset.tab;
+        document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.tab===this.currentTab));
+        document.querySelectorAll('.tabview').forEach(v => v.classList.toggle('active', v.id===`view-${this.currentTab}`));
+      });
+    }
+
+    refreshDerived() {
+      const s = this.state;
+      const cls = CLASSES[s.className];
+      this.bonus = {attack:1,hp:1,mana:1,speed:1,crit:0,gold:1,eidolon:1,boss:1,elemental:1,gaiaChance:0,dodge:0};
+      if (cls) {
+        this.bonus.attack *= cls.bonuses.attack;
+        this.bonus.hp *= cls.bonuses.hp;
+        this.bonus.mana *= cls.bonuses.mana;
+        this.bonus.speed *= cls.bonuses.speed;
+        this.bonus.crit += cls.bonuses.crit || 0;
+        this.bonus.gold *= cls.bonuses.gold || 1;
+      }
+      const eid = EIDOLONS[s.eidolon.name];
+      if (eid) {
+        Object.entries(eid.buffs).forEach(([k,v]) => {
+          if (['attack','hp','mana','speed','gold','boss'].includes(k)) this.bonus[k] = (this.bonus[k] || 1) * (1 + v + s.eidolon.level*0.01);
+          else if (k==='crit' || k==='dodge') this.bonus[k] += v + s.eidolon.level*0.002;
+          else this.bonus.elemental *= (1 + v*0.5 + s.eidolon.level*0.004);
+        });
+      }
+      SKILL_NODES.forEach(node => node.apply(this, s.skillRanks[node.id] || 0));
+      const eq = s.equipment;
+      ['weapon','armor','accessory'].forEach(slot => {
+        if (eq[slot]) {
+          const item = eq[slot];
+          if (item.stat === 'attack') this.bonus.attack *= (1 + item.value/100);
+          if (item.stat === 'hp') this.bonus.hp *= (1 + item.value/120);
+          if (item.stat === 'mana') this.bonus.mana *= (1 + item.value/110);
+          if (item.rarity === 'Legendary') this.bonus.crit += 0.02;
+          if (item.rarity === 'Epic') this.bonus.speed *= 1.03;
+        }
+      });
+      const rebirthMult = 1 + s.stats.rebirthEssence * 0.05;
+      this.bonus.attack *= rebirthMult;
+      this.bonus.hp *= rebirthMult;
+      this.bonus.gold *= 1 + s.stats.rebirthEssence * 0.04;
+      this.bonus.eidolon *= 1 + s.stats.rebirthEssence * 0.05;
+    }
+
+    maxHp() { return Math.floor((100 + (this.state.stats.level-1)*22) * this.bonus.hp); }
+    maxMana() { return Math.floor((50 + (this.state.stats.level-1)*10) * this.bonus.mana); }
+    attackPower() {
+      const comboBonus = 1 + Math.min(this.state.combat.combo, 12)*0.03;
+      return Math.floor((12 + (this.state.stats.level-1)*4.2) * this.bonus.attack * comboBonus);
+    }
+    eidolonPower() {
+      return Math.floor((8 + this.state.eidolon.level*4.2) * this.bonus.eidolon * this.bonus.elemental);
+    }
+    critChance() { return Math.min(0.65, 0.05 + this.bonus.crit + (this.state.stats.level-1)*0.002); }
+    speed() { return (1 + (this.state.stats.level-1)*0.01) * this.bonus.speed; }
+    goldMult() { return this.bonus.gold; }
+    nextLevelExp(level=this.state.stats.level) { return Math.floor(50 + Math.pow(level, 2.05) * 18); }
+    eidolonNextExp(level=this.state.eidolon.level) { return Math.floor(30 + Math.pow(level,1.9) * 12); }
+    skillPointsAvailable() { return Math.max(0, Math.floor(this.state.stats.level/2) + this.state.stats.rebirths*2 - this.state.stats.skillSpent); }
+    equipmentPower() { return Object.values(this.state.equipment).filter(Boolean).reduce((a,b)=>a+b.value,0); }
+
+    currentZone() { return ZONES[this.state.zoneIndex]; }
+
+    ensureEnemy() {
+      if (this.state.combat.enemy && this.state.combat.enemy.hp > 0) return;
+      const zone = this.currentZone();
+      const [name, icon] = zone.enemyPool[Math.floor(Math.random()*zone.enemyPool.length)];
+      const lvl = Math.max(zone.level, this.state.stats.level + (Math.random()<0.25?1:0));
+      const maxHp = Math.floor((42 + lvl * 16) * zone.exp * (1 + this.state.stats.rebirths*0.06));
+      const element = zone.elements[Math.floor(Math.random()*zone.elements.length)];
+      this.state.combat.enemy = {name, icon, level:lvl, hp:maxHp, maxHp, element};
+    }
+
+    tick(dt) {
+      if (!this.state.created) return;
+      this.refreshDerived();
+      this.regen(dt);
+      if (this.state.dungeon.active) this.runDungeon(dt);
+      else this.runBattle(dt);
+      this.checkUnlocks();
+      this.renderAll(false);
+    }
+
+    regen(dt) {
+      const c = this.state.combat;
+      c.hp = Math.min(this.maxHp(), c.hp + this.maxHp()*0.015*dt);
+      c.mana = Math.min(this.maxMana(), c.mana + this.maxMana()*0.02*dt);
+      c.skillCd = Math.max(0, c.skillCd - dt);
+      c.eidolonCd = Math.max(0, c.eidolonCd - dt);
+    }
+
+    runBattle(dt, offlineFactor=1) {
+      this.ensureEnemy();
+      const c = this.state.combat;
+      c.lastHit += dt * this.speed() * offlineFactor;
+      const attackInterval = 1.85 / this.speed();
+      while (c.lastHit >= attackInterval) {
+        c.lastHit -= attackInterval;
+        this.hitEnemy(false, offlineFactor);
+        if (!this.state.combat.enemy || this.state.combat.enemy.hp <= 0) break;
+      }
+      if (c.skillCd <= 0 && c.mana >= this.maxMana()*0.28) {
+        c.skillCd = 8.8;
+        c.mana -= this.maxMana()*0.28;
+        this.hitEnemy(true, offlineFactor);
+      }
+      if (c.eidolonCd <= 0) {
+        c.eidolonCd = 11.5;
+        this.eidolonStrike(offlineFactor);
+      }
+    }
+
+    hitEnemy(skill=false, offlineFactor=1) {
+      const enemy = this.state.combat.enemy;
+      if (!enemy) return;
+      let dmg = this.attackPower() * (skill ? 1.95 : 1) * (skill ? (1 + this.bonus.elemental*0.15) : 1);
+      let crit = Math.random() < this.critChance();
+      if (crit) dmg *= (this.state.player.critDamage + this.state.combat.combo*0.02);
+      if (this.state.dungeon.active) dmg *= 1 + this.bonus.boss*0.35;
+      dmg = Math.floor(dmg * offlineFactor);
+      enemy.hp -= dmg;
+      this.state.combat.combo = Math.min(12, this.state.combat.combo + 1);
+      this.state.combat.dpsDamage += dmg;
+      if (enemy.hp <= 0) this.onEnemyDefeat(skill, crit, offlineFactor);
+    }
+
+    eidolonStrike(offlineFactor=1) {
+      const enemy = this.state.combat.enemy;
+      if (!enemy) return;
+      const dmg = Math.floor(this.eidolonPower() * (1 + this.state.eidolon.level*0.015) * offlineFactor);
+      enemy.hp -= dmg;
+      this.state.combat.dpsDamage += dmg;
+      if (enemy.hp <= 0) this.onEnemyDefeat(false, false, offlineFactor, true);
+    }
+
+    onEnemyDefeat(skill, crit, offlineFactor=1, eidolonKill=false) {
+      const zone = this.currentZone();
+      const enemy = this.state.combat.enemy;
+      const exp = Math.floor((18 + enemy.level*4) * zone.exp * (1 + this.state.stats.rebirthEssence*0.03) * offlineFactor);
+      const gold = Math.floor((10 + enemy.level*3) * zone.gold * this.goldMult() * offlineFactor);
+      this.state.stats.exp += exp;
+      this.state.stats.gold += gold;
+      this.state.stats.kills += 1 * Math.max(1, Math.round(offlineFactor));
+      this.state.combat.combo = 0;
+      this.state.eidolon.exp += Math.floor(6 * zone.exp * offlineFactor);
+      if (Math.random() < (0.08 + this.bonus.gaiaChance + zone.level*0.001)) {
+        const g = 1 + (Math.random()<0.15 ? 1 : 0);
+        this.state.stats.gaia += g;
+        if (offlineFactor <= 3) this.flashLog(`💠 Gained ${g} Gaia Emblem${g>1?'s':''}.`);
+      }
+      if (Math.random() < 0.22) this.generateLoot(zone, enemy.level, offlineFactor);
+      if (offlineFactor <= 3) this.flashLog(`${eidolonKill?'🧚':'⚔️'} Defeated ${enemy.name}${skill?' with a skill':''}${crit?' (CRIT!)':''} for +${exp} EXP and +${gold} gold.`);
+      this.handleLevelUps();
+      this.handleEidolonUps();
+      this.ensureEnemy();
+    }
+
+    handleLevelUps() {
+      while (this.state.stats.exp >= this.nextLevelExp()) {
+        this.state.stats.exp -= this.nextLevelExp();
+        this.state.stats.level++;
+        this.fullRecover();
+        this.flashLog(`🌟 Level Up! You are now Lv. ${this.state.stats.level}. Skill point gained.`);
+      }
+    }
+
+    handleEidolonUps() {
+      while (this.state.eidolon.exp >= this.eidolonNextExp()) {
+        this.state.eidolon.exp -= this.eidolonNextExp();
+        this.state.eidolon.level++;
+        this.flashLog(`🧚 ${this.state.eidolon.name} reached Lv. ${this.state.eidolon.level}. Bond deepened!`);
+      }
+    }
+
+    generateLoot(zone, enemyLevel, offlineFactor=1) {
+      const type = EQUIP_TYPES[Math.floor(Math.random()*EQUIP_TYPES.length)];
+      const rarity = this.rollRarity();
+      const base = Math.floor((enemyLevel + zone.level + 2) * type.scale * (0.08 + Math.random()*0.07));
+      const value = Math.max(3, Math.floor(base * rarity.mult));
+      const item = {
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random()),
+        slot:type.slot,
+        name:type.names[Math.floor(Math.random()*type.names.length)],
+        rarity:rarity.name,
+        stat:type.stat,
+        value,
+        reqLevel: Math.max(1, enemyLevel - 1),
+        icon: type.slot === 'weapon' ? '🗡️' : type.slot === 'armor' ? '🥋' : '💍'
+      };
+      this.state.inventory.unshift(item);
+      this.state.inventory = this.state.inventory.slice(0, 80);
+      if (this.state.autoEquip) this.tryEquipBest(item.id);
+      if (offlineFactor <= 3) this.flashLog(`🎁 Loot: ${item.rarity} ${item.name} (+${item.value} ${item.stat}).`);
+    }
+
+    rollRarity() {
+      let r = Math.random();
+      for (const rarity of RARITIES) {
+        if (r < rarity.chance + this.state.stats.rebirthEssence*0.002) return rarity;
+        r -= rarity.chance;
+      }
+      return RARITIES[0];
+    }
+
+    tryEquipBest(id) {
+      const item = this.state.inventory.find(i => i.id === id);
+      if (!item || this.state.stats.level < item.reqLevel) return;
+      const current = this.state.equipment[item.slot];
+      if (!current || item.value > current.value) {
+        if (current) this.state.inventory.push(current);
+        this.state.equipment[item.slot] = item;
+        this.state.inventory = this.state.inventory.filter(i => i.id !== id);
+        this.refreshDerived();
+        this.flashLog(`🛠️ Equipped ${item.rarity} ${item.name}.`);
+      }
+    }
+
+    sellItem(id, rerender=true) {
+      const item = this.state.inventory.find(i => i.id===id);
+      if (!item) return;
+      const gain = Math.floor(item.value * ({Normal:2,Rare:4,Epic:8,Legendary:14}[item.rarity] || 2));
+      this.state.stats.gold += gain;
+      this.state.inventory = this.state.inventory.filter(i => i.id!==id);
+      this.flashLog(`💰 Sold ${item.name} for ${gain} gold.`);
+      if (rerender) this.renderAll();
+    }
+
+    startDungeon(index) {
+      const d = DUNGEONS[index];
+      if (this.state.stats.level < d.req) return;
+      this.state.dungeon.active = true;
+      this.state.dungeon.index = index;
+      this.state.dungeon.timeLeft = d.duration;
+      this.state.dungeon.bossMaxHp = Math.floor((240 + d.req*90) * d.rewardScale * (1 + this.state.stats.rebirths*0.1));
+      this.state.dungeon.bossHp = this.state.dungeon.bossMaxHp;
+      this.state.dungeon.manualBursts = 3;
+      this.state.combat.enemy = {name:d.boss, icon:d.icon, level:d.req+2, hp:this.state.dungeon.bossHp, maxHp:this.state.dungeon.bossMaxHp, element:'boss'};
+      this.flashLog(`🏛️ Entered ${d.name}. Boss: ${d.boss}.`);
+    }
+
+    manualBurst() {
+      if (!this.state.dungeon.active || this.state.dungeon.manualBursts <= 0) return;
+      this.state.dungeon.manualBursts--;
+      const burst = Math.floor(this.attackPower() * 3.5 + this.eidolonPower()*1.8);
+      this.state.dungeon.bossHp -= burst;
+      if (this.state.combat.enemy) this.state.combat.enemy.hp = this.state.dungeon.bossHp;
+      this.flashLog(`💥 Manual Burst dealt ${burst} boss damage!`);
+      if (this.state.dungeon.bossHp <= 0) this.finishDungeon(true);
+    }
+
+    runDungeon(dt, offlineFactor=1) {
+      const d = DUNGEONS[this.state.dungeon.index];
+      this.state.dungeon.timeLeft -= dt * offlineFactor;
+      this.state.combat.enemy = {name:d.boss, icon:d.icon, level:d.req+2, hp:this.state.dungeon.bossHp, maxHp:this.state.dungeon.bossMaxHp, element:'boss'};
+      this.state.combat.lastHit += dt * this.speed() * offlineFactor;
+      const interval = 1.95 / this.speed();
+      while (this.state.combat.lastHit >= interval) {
+        this.state.combat.lastHit -= interval;
+        let dmg = Math.floor(this.attackPower() * (1 + this.bonus.boss) * offlineFactor);
+        if (Math.random() < this.critChance()) dmg = Math.floor(dmg * this.state.player.critDamage);
+        this.state.dungeon.bossHp -= dmg;
+        if (this.state.dungeon.bossHp <= 0) { this.finishDungeon(true, offlineFactor); return; }
+      }
+      if (this.state.combat.skillCd <= 0 && this.state.combat.mana >= this.maxMana()*0.25) {
+        this.state.combat.skillCd = 8.8;
+        this.state.combat.mana -= this.maxMana()*0.25;
+        this.state.dungeon.bossHp -= Math.floor(this.attackPower()*2.25*(1+this.bonus.boss*0.4)*offlineFactor);
+      }
+      if (this.state.combat.eidolonCd <= 0) {
+        this.state.combat.eidolonCd = 11.5;
+        this.state.dungeon.bossHp -= Math.floor(this.eidolonPower()*1.5*(1+this.bonus.boss*0.3)*offlineFactor);
+      }
+      if (this.state.dungeon.bossHp <= 0) return this.finishDungeon(true, offlineFactor);
+      if (this.state.dungeon.timeLeft <= 0) return this.finishDungeon(false, offlineFactor);
+      if (this.state.combat.enemy) this.state.combat.enemy.hp = this.state.dungeon.bossHp;
+    }
+
+    finishDungeon(win, offlineFactor=1) {
+      const d = DUNGEONS[this.state.dungeon.index];
+      if (win) {
+        const gold = Math.floor((120 + d.req*35) * d.rewardScale * this.goldMult() * offlineFactor);
+        const exp = Math.floor((140 + d.req*38) * d.rewardScale * offlineFactor);
+        const gaia = 1 + (Math.random()<0.45 ? 1 : 0) + (Math.random()<0.12 ? 1 : 0);
+        this.state.stats.gold += gold;
+        this.state.stats.exp += exp;
+        this.state.stats.gaia += gaia;
+        this.state.stats.dungeonClears += 1;
+        this.state.eidolon.exp += Math.floor(exp*0.25);
+        this.generateLoot(this.currentZone(), d.req+5, Math.min(offlineFactor,3));
+        if (Math.random() < 0.5) this.generateLoot(this.currentZone(), d.req+8, Math.min(offlineFactor,3));
+        this.handleLevelUps();
+        this.handleEidolonUps();
+        this.flashLog(`👑 Cleared ${d.name}! +${exp} EXP, +${gold} gold, +${gaia} Gaia Emblems.`);
+      } else {
+        this.flashLog(`💀 ${d.name} failed. The boss endures.`);
+      }
+      this.state.dungeon.active = false;
+      this.state.dungeon.timeLeft = 0;
+      this.ensureEnemy();
+    }
+
+    applyOfflineProgress() {
+      const now = Date.now();
+      const delta = Math.max(0, Math.min(OFFLINE_CAP_MS, now - (this.state.lastSave || now)));
+      if (!this.state.created || delta < 10000) {
+        this.state.lastSave = now;
+        return;
+      }
+      const secs = delta / 1000;
+      const offlineFactor = Math.max(1, secs / 12);
+      const before = {gold:this.state.stats.gold, exp:this.state.stats.exp, gaia:this.state.stats.gaia};
+      if (this.state.dungeon.active) this.runDungeon(secs, 1);
+      else this.runBattle(secs, 1);
+      const goldGain = this.state.stats.gold - before.gold;
+      const expGain = this.state.stats.exp - before.exp;
+      const gaiaGain = this.state.stats.gaia - before.gaia;
+      this.flashLog(`🕒 Offline progress (${Math.floor(secs/60)}m ${Math.floor(secs%60)}s): +${goldGain} gold, +${expGain} EXP, +${gaiaGain} Gaia.`);
+      this.state.lastSave = now;
+      this.renderAll();
+    }
+
+    checkUnlocks() {
+      ZONES.forEach((zone, idx) => {
+        if (idx > 0 && this.state.stats.level >= zone.level && !this.state.unlockedZones.includes(idx)) {
+          this.state.unlockedZones.push(idx);
+          this.flashLog(`🗺️ New zone unlocked: ${zone.name}.`);
+        }
+      });
+      if (!this.state.dungeon.active && this.state.autoDungeon) {
+        const best = [...DUNGEONS].reverse().find(d => this.state.stats.level >= d.req);
+        if (best && Math.random() < 0.0025) this.startDungeon(DUNGEONS.findIndex(x=>x.name===best.name));
+      }
+    }
+
+    questProgress(q) {
+      switch(q.goalType) {
+        case 'kills': return this.state.stats.kills;
+        case 'eidolonLevel': return this.state.eidolon.level;
+        case 'skillSpend': return this.state.stats.skillSpent;
+        case 'equipPower': return this.equipmentPower();
+        case 'zone': return this.state.zoneIndex;
+        case 'dungeonClears': return this.state.stats.dungeonClears;
+        case 'rebirths': return this.state.stats.rebirths;
+      }
+      return 0;
+    }
+
+    claimQuest(id) {
+      const q = QUESTS.find(q=>q.id===id);
+      if (!q || this.state.questsClaimed[id]) return;
+      if (this.questProgress(q) < q.target) return;
+      this.state.questsClaimed[id] = true;
+      this.state.stats.gold += q.reward.gold || 0;
+      this.state.stats.gaia += q.reward.gaia || 0;
+      this.flashLog(`📜 Quest complete: ${q.name}. Rewards claimed.`);
+      this.renderQuests();
+      this.renderLeft();
+    }
+
+    spendSkill(id) {
+      const node = SKILL_NODES.find(n=>n.id===id);
+      if (!node) return;
+      const rank = this.state.skillRanks[id] || 0;
+      if (rank >= node.max) return;
+      if (this.skillPointsAvailable() < node.cost) return;
+      this.state.skillRanks[id] = rank + 1;
+      this.state.stats.skillSpent += node.cost;
+      this.refreshDerived();
+      this.flashLog(`🌿 Learned ${node.name} Lv. ${rank+1}.`);
+      this.renderSkills();
+      this.renderLeft();
+    }
+
+    canRebirth() { return this.state.stats.level >= 20; }
+    rebirthGainPreview() { return Math.max(0, Math.floor((this.state.stats.level - 10) / 10) + this.state.stats.dungeonClears); }
+    rebirth() {
+      if (!this.canRebirth()) return;
+      const gain = this.rebirthGainPreview();
+      const keepGaia = this.state.stats.gaia;
+      const keepEssence = this.state.stats.rebirthEssence + gain;
+      const keepRebirths = this.state.stats.rebirths + 1;
+      const keepName = this.state.name;
+      const keepClass = this.state.className;
+      const keepEid = this.state.eidolon.name;
+      const autoDungeon = this.state.autoDungeon;
+      const autoEquip = this.state.autoEquip;
+      this.state = DEFAULT_STATE();
+      this.state.created = true;
+      this.state.name = keepName;
+      this.state.className = keepClass;
+      this.state.eidolon.name = keepEid;
+      this.state.stats.gaia = keepGaia;
+      this.state.stats.rebirths = keepRebirths;
+      this.state.stats.rebirthEssence = keepEssence;
+      this.state.autoDungeon = autoDungeon;
+      this.state.autoEquip = autoEquip;
+      this.fullRecover();
+      this.refreshDerived();
+      this.flashLog(`♾️ Rebirth complete. Gained ${gain} Soul Essence.`);
+      this.save();
+      this.renderAll();
+    }
+
+    fullRecover() {
+      this.state.combat.hp = this.maxHp();
+      this.state.combat.mana = this.maxMana();
+    }
+
+    switchZone(idx) {
+      if (!this.state.unlockedZones.includes(idx)) return;
+      this.state.zoneIndex = idx;
+      this.state.combat.enemy = null;
+      this.ensureEnemy();
+      this.flashLog(`🗺️ Traveling to ${this.currentZone().name}.`);
+      this.renderBattle();
+      this.renderLeft();
+    }
+
+    format(n) { return Math.floor(n).toLocaleString(); }
+
+    renderAll(refreshShell=true) {
+      if (refreshShell) this.renderShell();
+      this.renderLeft();
+      this.renderBattle();
+      this.renderSkills();
+      this.renderGear();
+      this.renderShop();
+      this.renderDungeons();
+      this.renderQuests();
+      this.renderPrestige();
+      this.renderRight();
+    }
+
+    renderLeft() {
+      const s = this.state;
+      const cls = CLASSES[s.className];
+      const eid = EIDOLONS[s.eidolon.name];
+      const xpPct = Math.min(100, s.stats.exp / this.nextLevelExp() * 100);
+      const ePct = Math.min(100, s.eidolon.exp / this.eidolonNextExp() * 100);
+      document.getElementById('leftPanel').innerHTML = `
+        <div class="heroTitle">
+          <div class="avatar">${cls?.icon || '✨'}</div>
+          <div>
+            <div class="bigNum">${this.escape(s.name)}</div>
+            <div class="sub">Lv. ${s.stats.level} ${s.className} · ${this.currentZone().name}</div>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="currency">
+            <div class="pill"><div class="small muted">Gold</div><div class="bigNum">🪙 ${this.format(s.stats.gold)}</div></div>
+            <div class="pill"><div class="small muted">Gaia Emblems</div><div class="bigNum">💠 ${this.format(s.stats.gaia)}</div></div>
+          </div>
+          <div class="barWrap">
+            <div class="labelRow"><span>EXP</span><span>${this.format(s.stats.exp)} / ${this.format(this.nextLevelExp())}</span></div>
+            <div class="bar"><div class="fill" style="width:${xpPct}%"></div></div>
+          </div>
+          <div class="barWrap">
+            <div class="labelRow"><span>${eid.icon} ${s.eidolon.name} Lv. ${s.eidolon.level}</span><span>${this.format(s.eidolon.exp)} / ${this.format(this.eidolonNextExp())}</span></div>
+            <div class="bar"><div class="fill" style="width:${ePct}%"></div></div>
+          </div>
+          <div class="statGrid">
+            <div class="stat"><div class="small muted">Attack</div><div>${this.format(this.attackPower())}</div></div>
+            <div class="stat"><div class="small muted">Max HP</div><div>${this.format(this.maxHp())}</div></div>
+            <div class="stat"><div class="small muted">Attack Speed</div><div>${this.speed().toFixed(2)}x</div></div>
+            <div class="stat"><div class="small muted">Crit Chance</div><div>${(this.critChance()*100).toFixed(1)}%</div></div>
+            <div class="stat"><div class="small muted">Eidolon Power</div><div>${this.format(this.eidolonPower())}</div></div>
+            <div class="stat"><div class="small muted">Equip Power</div><div>${this.format(this.equipmentPower())}</div></div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <button id="saveBtn">Save</button>
+            <button id="recoverBtn">Recover</button>
+            <button id="resetBtn">Hard Reset</button>
+          </div>
+        </div>`;
+      document.getElementById('saveBtn').onclick = () => this.save();
+      document.getElementById('recoverBtn').onclick = () => {this.fullRecover(); this.flashLog('💖 HP and mana restored.'); this.renderLeft();};
+      document.getElementById('resetBtn').onclick = () => { if (confirm('Erase all progress?')) this.hardReset(); };
+    }
+
+    renderBattle() {
+      const view = document.getElementById('view-battle');
+      const zone = this.currentZone();
+      const e = this.state.combat.enemy || {name:'—', icon:'❔', hp:1, maxHp:1, level:1};
+      const hpPct = Math.max(0, e.hp/e.maxHp*100);
+      const myHpPct = Math.max(0, this.state.combat.hp/this.maxHp()*100);
+      const myManaPct = Math.max(0, this.state.combat.mana/this.maxMana()*100);
+      view.innerHTML = `
+        <div class="notice">⚡ Your hero attacks automatically. Skills fire on cooldown, the Eidolon assists on its own, and offline gains are computed on return (up to 8 hours).</div>
+        <div class="zoneGrid">
+          ${ZONES.map((z, idx) => `
+            <div class="zoneCard">
+              <div class="labelRow"><div class="bigNum">${z.icon} ${z.name}</div><span class="badge ${idx===this.state.zoneIndex?'active':''}">Lv. ${z.level}+</span></div>
+              <div class="small muted">Dungeon: ${z.dungeon}</div>
+              <div class="small">Enemy elements: ${z.elements.join(', ')}</div>
+              <div style="margin-top:10px"><button ${!this.state.unlockedZones.includes(idx)?'disabled':''} data-zone="${idx}">${idx===this.state.zoneIndex?'Current Zone':'Travel'}</button></div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="enemyCard">
+          <div class="labelRow"><div><div class="enemyArt">${e.icon}</div><div class="bigNum">${e.name}</div><div class="sub">Enemy Lv. ${e.level} · ${e.element || zone.elements[0]}</div></div><div class="kpi"><div class="small muted">Combo</div><div class="bigNum">${this.state.combat.combo}</div></div></div>
+          <div class="barWrap"><div class="labelRow"><span>Enemy HP</span><span>${this.format(Math.max(0,e.hp))} / ${this.format(e.maxHp)}</span></div><div class="bar"><div class="fill hp" style="width:${hpPct}%"></div></div></div>
+          <div class="kpiGrid">
+            <div class="kpi"><div class="small muted">Zone Gold</div><div>×${zone.gold.toFixed(2)}</div></div>
+            <div class="kpi"><div class="small muted">Zone EXP</div><div>×${zone.exp.toFixed(2)}</div></div>
+            <div class="kpi"><div class="small muted">Combat Tempo</div><div>Slow / Tactical</div></div>
+          </div>
+        </div>
+        <div class="enemyCard green">
+          <div class="labelRow"><div class="bigNum">${CLASSES[this.state.className].icon} ${this.state.name}</div><div class="badge">${this.state.className}</div></div>
+          <div class="barWrap"><div class="labelRow"><span>HP</span><span>${this.format(this.state.combat.hp)} / ${this.format(this.maxHp())}</span></div><div class="bar"><div class="fill hp" style="width:${myHpPct}%"></div></div></div>
+          <div class="barWrap"><div class="labelRow"><span>Mana</span><span>${this.format(this.state.combat.mana)} / ${this.format(this.maxMana())}</span></div><div class="bar"><div class="fill mana" style="width:${myManaPct}%"></div></div></div>
+          <div class="row">
+            <button id="toggleAutoDungeon">Auto Dungeon: ${this.state.autoDungeon?'ON':'OFF'}</button>
+            <button id="toggleAutoEquip">Auto Equip: ${this.state.autoEquip?'ON':'OFF'}</button>
+          </div>
+        </div>`;
+      view.querySelectorAll('[data-zone]').forEach(btn => btn.onclick = () => this.switchZone(Number(btn.dataset.zone)));
+      view.querySelector('#toggleAutoDungeon').onclick = () => { this.state.autoDungeon = !this.state.autoDungeon; this.renderBattle(); };
+      view.querySelector('#toggleAutoEquip').onclick = () => { this.state.autoEquip = !this.state.autoEquip; this.renderBattle(); };
+    }
+
+    renderSkills() {
+      const view = document.getElementById('view-skills');
+      view.innerHTML = `
+        <div class="notice">🌿 Spend skill points earned every 2 levels. Your class identity comes from passive bonuses, gear, and this skill tree.</div>
+        <div class="bigNum" style="margin-bottom:10px">Available Skill Points: ${this.skillPointsAvailable()}</div>
+        <div class="skillGrid">
+          ${SKILL_NODES.map(node => {
+            const rank = this.state.skillRanks[node.id] || 0;
+            return `<div class="skillCard">
+              <div class="labelRow"><div class="bigNum">${node.name}</div><span class="badge">${rank}/${node.max}</span></div>
+              <p class="sub">${node.desc}</p>
+              <button data-skill="${node.id}" ${rank>=node.max || this.skillPointsAvailable()<node.cost?'disabled':''}>Upgrade (${node.cost} SP)</button>
+            </div>`;
+          }).join('')}
+        </div>`;
+      view.querySelectorAll('[data-skill]').forEach(btn => btn.onclick = () => this.spendSkill(btn.dataset.skill));
+    }
+
+    renderShop() {
+      const view = document.getElementById('view-shop');
+      const sellable = [...this.state.inventory].sort((a,b)=>b.value-a.value);
+      const preview = sellable.slice(0, 8);
+      const normalCount = this.state.inventory.filter(i => i.rarity === 'Normal').length;
+      const rareCount = this.state.inventory.filter(i => i.rarity === 'Rare').length;
+      view.innerHTML = `
+        <div class="notice">🏪 Cleaner economy hub: buy a few convenience supplies, sell off extra drops, and keep the rest of the UI focused on battling.</div>
+        <div class="kpiGrid">
+          <div class="kpi"><div class="small muted">Gold on Hand</div><div class="bigNum">🪙 ${this.format(this.state.stats.gold)}</div></div>
+          <div class="kpi"><div class="small muted">Sellable Gear</div><div class="bigNum">${this.state.inventory.length}</div></div>
+          <div class="kpi"><div class="small muted">Quick Trash</div><div class="bigNum">${normalCount} N / ${rareCount} R</div></div>
+        </div>
+        <div class="shopCard">
+          <div class="labelRow"><div class="bigNum">Quick Sell</div><span class="badge">Inventory cleanup</span></div>
+          <div class="row" style="margin-top:8px">
+            <button id="shopSellNormals">Sell All Normal</button>
+            <button id="shopSellRares">Sell All Rare</button>
+            <button id="shopSellHalf">Sell Lowest 5</button>
+          </div>
+        </div>
+        <div class="shopCard">
+          <div class="labelRow"><div class="bigNum">Supply Counter</div><span class="badge">Gold sink</span></div>
+          <div class="inventory">
+            <div class="item">
+              <div><div class="bigNum">🍗 Captain's Meal</div><div class="small muted">Fully restore HP and mana instantly.</div></div>
+              <div class="row"><div class="badge">120 gold</div><button data-buy="meal">Buy</button></div>
+            </div>
+            <div class="item">
+              <div><div class="bigNum">🧪 Focus Draft</div><div class="small muted">Gain 15 minutes of +10% zone gold and EXP.</div></div>
+              <div class="row"><div class="badge">400 gold</div><button data-buy="draft">Buy</button></div>
+            </div>
+            <div class="item">
+              <div><div class="bigNum">🧲 Loot Net</div><div class="small muted">Gain one guaranteed gear drop from your current zone.</div></div>
+              <div class="row"><div class="badge">650 gold</div><button data-buy="loot">Buy</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="shopCard">
+          <div class="labelRow"><div class="bigNum">Sell Individually</div><span class="badge">Top value items</span></div>
+          <div class="inventory">
+            ${preview.length ? preview.map(item => `
+              <div class="item">
+                <div>
+                  <div class="rarity-${item.rarity.toLowerCase()}">${item.icon} ${item.name}</div>
+                  <div class="small muted">${item.rarity} ${item.slot} · Power ${item.value} · Req Lv. ${item.reqLevel}</div>
+                </div>
+                <div class="row">
+                  <button data-sell-shop="${item.id}">Sell</button>
+                </div>
+              </div>
+            `).join('') : '<div class="sub">No spare gear to sell right now.</div>'}
+          </div>
+        </div>`;
+      const byId = id => view.querySelector(id);
+      byId('#shopSellNormals').onclick = () => {
+        const ids = this.state.inventory.filter(i => i.rarity === 'Normal').map(i => i.id);
+        ids.forEach(id => this.sellItem(id, false));
+        this.flashLog(ids.length ? `💰 Sold ${ids.length} Normal items.` : '🧺 No Normal items to sell.');
+        this.renderAll();
+      };
+      byId('#shopSellRares').onclick = () => {
+        const ids = this.state.inventory.filter(i => i.rarity === 'Rare').map(i => i.id);
+        ids.forEach(id => this.sellItem(id, false));
+        this.flashLog(ids.length ? `💰 Sold ${ids.length} Rare items.` : '🧺 No Rare items to sell.');
+        this.renderAll();
+      };
+      byId('#shopSellHalf').onclick = () => {
+        const ids = [...this.state.inventory].sort((a,b)=>a.value-b.value).slice(0,5).map(i=>i.id);
+        ids.forEach(id => this.sellItem(id, false));
+        this.flashLog(ids.length ? `💰 Sold ${ids.length} low-value items.` : '🧺 No items to sell.');
+        this.renderAll();
+      };
+      view.querySelectorAll('[data-sell-shop]').forEach(btn => btn.onclick = () => { this.sellItem(btn.dataset.sellShop); this.renderShop(); });
+      view.querySelectorAll('[data-buy]').forEach(btn => btn.onclick = () => this.buyShopItem(btn.dataset.buy));
+    }
+
+    buyShopItem(type) {
+      const prices = {meal:120, draft:400, loot:650};
+      const price = prices[type];
+      if (!price || this.state.stats.gold < price) return this.flashLog('🏪 Not enough gold.');
+      this.state.stats.gold -= price;
+      if (type === 'meal') {
+        this.fullRecover();
+        this.flashLog("🍗 Captain's Meal used. Fully restored.");
+      } else if (type === 'draft') {
+        this.state.stats.gold += Math.floor(120 * this.currentZone().gold);
+        this.state.stats.exp += Math.floor(150 * this.currentZone().exp);
+        this.handleLevelUps();
+        this.flashLog('🧪 Focus Draft used. Got a burst of gold and EXP.');
+      } else if (type === 'loot') {
+        this.generateLoot(this.currentZone(), Math.max(this.currentZone().level, this.state.stats.level));
+        this.flashLog('🧲 Loot Net snagged an extra drop from the current zone.');
+      }
+      this.renderAll();
+    }
+
+    renderGear() {
+      const view = document.getElementById('view-gear');
+      const eq = this.state.equipment;
+      const slotName = s => s.charAt(0).toUpperCase() + s.slice(1);
+      view.innerHTML = `
+        <div class="notice">🎒 Gear drops from monsters and dungeons. Higher rarities spike power fast, especially on weapons.</div>
+        <div class="eqGrid">
+          ${['weapon','armor','accessory'].map(slot => {
+            const item = eq[slot];
+            return `<div class="equipSlot">
+              <div class="small muted">${slotName(slot)}</div>
+              ${item ? `<div class="bigNum rarity-${item.rarity.toLowerCase()}">${item.icon} ${item.name}</div><div class="small">${item.rarity} · +${item.value} ${item.stat}</div>` : `<div class="sub">Empty</div>`}
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="labelRow" style="margin:12px 0 8px"><div class="bigNum">Inventory (${this.state.inventory.length})</div><button id="sellAllNormals">Sell Normal Gear</button></div>
+        <div class="inventory">
+          ${this.state.inventory.length ? this.state.inventory.map(item => `
+            <div class="item">
+              <div>
+                <div class="rarity-${item.rarity.toLowerCase()}">${item.icon} ${item.name}</div>
+                <div class="small muted">${item.rarity} ${item.slot} · +${item.value} ${item.stat} · Req Lv. ${item.reqLevel}</div>
+              </div>
+              <div class="row">
+                <button data-equip="${item.id}" ${this.state.stats.level < item.reqLevel ? 'disabled' : ''}>Equip</button>
+                <button data-sell="${item.id}">Sell</button>
+              </div>
+            </div>
+          `).join('') : `<div class="sub">No extra gear yet. Farm enemies or clear dungeons to find equipment.</div>`}
+        </div>`;
+      view.querySelectorAll('[data-equip]').forEach(btn => btn.onclick = () => { this.tryEquipBest(btn.dataset.equip); this.renderAll(); });
+      view.querySelectorAll('[data-sell]').forEach(btn => btn.onclick = () => this.sellItem(btn.dataset.sell));
+      view.querySelector('#sellAllNormals').onclick = () => {
+        const ids = this.state.inventory.filter(i=>i.rarity==='Normal').map(i=>i.id);
+        ids.forEach(id => this.sellItem(id));
+        this.renderAll();
+      };
+    }
+
+    renderDungeons() {
+      const view = document.getElementById('view-dungeons');
+      const active = this.state.dungeon.active;
+      view.innerHTML = `
+        <div class="notice">🏛️ Dungeons are timed boss runs with better loot and Gaia income. Auto Dungeon occasionally launches your best available dungeon if enabled.</div>
+        ${active ? `
+          <div class="dungeonCard danger">
+            <div class="labelRow"><div class="bigNum">${DUNGEONS[this.state.dungeon.index].icon} ${DUNGEONS[this.state.dungeon.index].name}</div><span class="badge active">Boss Active</span></div>
+            <div class="sub">Boss: ${DUNGEONS[this.state.dungeon.index].boss}</div>
+            <div class="barWrap"><div class="labelRow"><span>Boss HP</span><span>${this.format(Math.max(0,this.state.dungeon.bossHp))} / ${this.format(this.state.dungeon.bossMaxHp)}</span></div><div class="bar"><div class="fill hp" style="width:${Math.max(0, this.state.dungeon.bossHp/this.state.dungeon.bossMaxHp*100)}%"></div></div></div>
+            <div class="small">Time Remaining: ${this.state.dungeon.timeLeft.toFixed(1)}s</div>
+            <div class="row" style="margin-top:10px">
+              <button id="manualBurstBtn" ${this.state.dungeon.manualBursts<=0?'disabled':''}>Manual Burst (${this.state.dungeon.manualBursts})</button>
+            </div>
+          </div>
+        ` : ''}
+        ${DUNGEONS.map((d, idx) => `
+          <div class="dungeonCard">
+            <div class="labelRow"><div class="bigNum">${d.icon} ${d.name}</div><span class="badge">Req Lv. ${d.req}</span></div>
+            <div class="sub">Zone: ${d.zone}</div>
+            <div class="small">Boss: ${d.boss} · Duration: ${d.duration}s · Reward Scale: ×${d.rewardScale}</div>
+            <div style="margin-top:10px"><button data-dungeon="${idx}" ${active || this.state.stats.level<d.req?'disabled':''}>Start Run</button></div>
+          </div>
+        `).join('')}`;
+      view.querySelectorAll('[data-dungeon]').forEach(btn => btn.onclick = () => { this.startDungeon(Number(btn.dataset.dungeon)); this.renderDungeons(); });
+      const mb = view.querySelector('#manualBurstBtn');
+      if (mb) mb.onclick = () => { this.manualBurst(); this.renderDungeons(); };
+    }
+
+    renderQuests() {
+      const view = document.getElementById('view-quests');
+      view.innerHTML = `
+        <div class="notice">📜 Quest milestones reward gold and Gaia Emblems. They help guide the early and midgame curve.</div>
+        ${QUESTS.map(q => {
+          const prog = Math.min(q.target, this.questProgress(q));
+          const done = !!this.state.questsClaimed[q.id];
+          return `<div class="questCard ${done?'green':''}">
+            <div class="labelRow"><div class="bigNum">${q.name}</div><span class="badge">${prog}/${q.target}</span></div>
+            <div class="sub">${q.text}</div>
+            <div class="inlineProgress"><div style="width:${prog/q.target*100}%"></div></div>
+            <div class="tinyRow" style="margin-top:8px"><span>Reward: ${q.reward.gold||0} gold, ${q.reward.gaia||0} Gaia</span>${done?'<span>Claimed</span>':`<button data-quest="${q.id}" ${prog<q.target?'disabled':''}>Claim</button>`}</div>
+          </div>`;
+        }).join('')}`;
+      view.querySelectorAll('[data-quest]').forEach(btn => btn.onclick = () => this.claimQuest(btn.dataset.quest));
+    }
+
+    renderPrestige() {
+      const view = document.getElementById('view-prestige');
+      view.innerHTML = `
+        <div class="notice">♾️ Rebirth resets your level, zones, gear, and skill ranks. You keep Gaia Emblems, your class choice, your Eidolon, and earn permanent Soul Essence.</div>
+        <div class="kpiGrid">
+          <div class="kpi"><div class="small muted">Rebirths</div><div class="bigNum">${this.state.stats.rebirths}</div></div>
+          <div class="kpi"><div class="small muted">Soul Essence</div><div class="bigNum">${this.state.stats.rebirthEssence}</div></div>
+          <div class="kpi"><div class="small muted">Next Gain</div><div class="bigNum">${this.rebirthGainPreview()}</div></div>
+        </div>
+        <div class="questCard" style="margin-top:12px">
+          <p class="sub">Each Soul Essence grants permanent +5% attack/hp/eidolon power and +4% gold gain. Rebirth becomes worthwhile around Lv. 20+, especially after a few dungeon clears.</p>
+          <div class="row" style="margin-top:10px">
+            <button id="rebirthBtn" ${!this.canRebirth()?'disabled':''}>Rebirth Now</button>
+          </div>
+        </div>`;
+      view.querySelector('#rebirthBtn').onclick = () => { if(confirm('Rebirth and reset current run?')) this.rebirth(); };
+    }
+
+    renderRight() {
+      const zone = this.currentZone();
+      const d = this.state.dungeon.active ? DUNGEONS[this.state.dungeon.index] : null;
+      const eid = EIDOLONS[this.state.eidolon.name];
+      document.getElementById('rightPanel').innerHTML = `
+        <div class="hd"><span>Companion & Adventure Log</span><span class="small muted">Live systems</span></div>
+        <div class="bd">
+          <div class="eidolonCard">
+            <div class="labelRow"><div class="bigNum">${eid.icon} ${this.state.eidolon.name}</div><span class="badge">Lv. ${this.state.eidolon.level}</span></div>
+            <p class="sub">${eid.desc}</p>
+            <p class="small">Active: ${eid.active}</p>
+            <p class="small muted">Buffs: ${Object.entries(eid.buffs).map(([k,v]) => `+${Math.round(v*100)}% ${k}`).join(' · ')}</p>
+          </div>
+          <div class="zoneCard">
+            <div class="labelRow"><div class="bigNum">${zone.icon} ${zone.name}</div><span class="badge">Recommended Lv. ${zone.level}</span></div>
+            <div class="small">Current Dungeon: ${zone.dungeon}</div>
+            <div class="small muted">${this.state.dungeon.active ? `Dungeon active: ${d.name}` : 'Free-roaming auto-battle active.'}</div>
+          </div>
+          <div class="questCard">
+            <div class="labelRow"><span>Quick Stats</span><span class="badge">Run Totals</span></div>
+            <div class="tinyRow"><span>Kills</span><span>${this.format(this.state.stats.kills)}</span></div>
+            <div class="tinyRow"><span>Dungeon Clears</span><span>${this.format(this.state.stats.dungeonClears)}</span></div>
+            <div class="tinyRow"><span>Skill Points Spent</span><span>${this.format(this.state.stats.skillSpent)}</span></div>
+          </div>
+          <div class="labelRow" style="margin:10px 0"><div class="bigNum">Adventure Log</div><span class="small muted">Latest first</span></div>
+          <div class="log">${this.logs.map(line => `<div>${this.escape(line)}</div>`).join('')}</div>
+        </div>`;
+    }
+  }
+
+  window.game = new Game();
+})();
+</script>
+</body>
+</html>
