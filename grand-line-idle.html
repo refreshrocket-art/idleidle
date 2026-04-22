@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grand Line Idle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <canvas id="ocean"></canvas>
+  <div class="app-shell">
+    <header class="topbar game-panel">
+      <div class="brand-block">
+        <div class="logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img" aria-label="Grand Line Idle logo">
+            <path d="M11 42c8-17 34-30 42-24-7 4-10 10-10 18 0 8 4 12 10 14-11 5-34-3-42-8 6-1 10-4 11-8-3-1-7-2-11-2 0-3 0-5 0-7 0-1 0-2 0-3Z" fill="currentColor"></path>
+            <circle cx="22" cy="23" r="6" fill="none" stroke="currentColor" stroke-width="4"></circle>
+            <path d="M20 29l-4 11M24 29l5 10" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="eyebrow">Idle pirate adventure</p>
+          <h1>Grand Line Idle</h1>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">☀</button>
+        <button id="saveHintBtn" class="ghost-btn" type="button">Snapshot State</button>
+      </div>
+    </header>
+
+    <main id="main" class="layout-grid">
+      <section class="left-column stack-gap">
+        <article class="hero-panel game-panel">
+          <div class="hero-copy">
+            <p class="eyebrow">Set sail alone, build a legendary crew, and let battles fund the voyage.</p>
+            <h2>Recruit a Straw Hat inspired crew and conquer the Grand Line through idle combat.</h2>
+            <p>The game runs fully in your browser. Progress is session-based, with prestige through Pirate King fame that permanently boosts every future voyage.</p>
+          </div>
+          <div class="resource-grid" id="resourceGrid"></div>
+        </article>
+
+        <article class="game-panel section-panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Current route</p>
+              <h3 id="zoneName">Foosha Village Coast</h3>
+            </div>
+            <div class="pill" id="zoneReq">Starter Sea</div>
+          </div>
+          <div class="battle-card">
+            <div class="enemy-portrait" id="enemyPortrait" aria-hidden="true"></div>
+            <div class="battle-info">
+              <div class="battle-row"><span>Enemy</span><strong id="enemyName">Coast Bandit</strong></div>
+              <div class="battle-row"><span>HP</span><strong id="enemyHp">0 / 0</strong></div>
+              <div class="progress-bar"><div id="enemyHpBar"></div></div>
+              <div class="battle-row"><span>Crew DPS</span><strong id="crewDps">0</strong></div>
+              <div class="battle-row"><span>Battle Speed</span><strong id="battleSpeed">1.00x</strong></div>
+              <div class="progress-bar cast-bar"><div id="attackBar"></div></div>
+            </div>
+          </div>
+          <div class="battle-actions">
+            <button id="manualAttackBtn" class="primary-btn" type="button">Manual Strike</button>
+            <button id="nextZoneBtn" class="secondary-btn" type="button">Advance Route</button>
+            <button id="prevZoneBtn" class="ghost-btn" type="button">Previous Route</button>
+          </div>
+          <div class="battle-log" id="battleLog" aria-live="polite"></div>
+        </article>
+
+        <article class="game-panel section-panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Crew roster</p>
+              <h3>Recruit and level crewmates</h3>
+            </div>
+            <div class="pill" id="crewPower">Power 0</div>
+          </div>
+          <div class="crew-grid" id="crewGrid"></div>
+        </article>
+      </section>
+
+      <aside class="right-column stack-gap">
+        <article class="game-panel section-panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Ship systems</p>
+              <h3>Automation upgrades</h3>
+            </div>
+          </div>
+          <div class="upgrade-list" id="upgradeList"></div>
+        </article>
+
+        <article class="game-panel section-panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Permanent growth</p>
+              <h3>Pirate King prestige</h3>
+            </div>
+            <div class="pill accent">Fame boosts all gains</div>
+          </div>
+          <p class="prestige-copy" id="prestigeText"></p>
+          <button id="prestigeBtn" class="warning-btn" type="button">Ascend Voyage</button>
+        </article>
+
+        <article class="game-panel section-panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Voyage goals</p>
+              <h3>Milestones</h3>
+            </div>
+          </div>
+          <ul class="milestone-list" id="milestoneList"></ul>
+        </article>
+      </aside>
+    </main>
+  </div>
+
+  <div id="floatingNumbers" aria-hidden="true"></div>
+  <script src="./assets/game.js" defer></script>
+</body>
+</html>
