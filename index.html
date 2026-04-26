@@ -1,1192 +1,2258 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Grand Line Idle - One Piece Idle RPG</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Piece: Grand Line Idle RPG</title>
 <style>
-  :root {
-    --bg: #0f1f2f;
-    --panel: rgba(9, 19, 31, 0.9);
-    --panel2: rgba(18, 34, 52, 0.92);
-    --line: rgba(255,255,255,0.12);
-    --gold: #ffd166;
-    --blue: #59c3ff;
-    --green: #71e39d;
-    --red: #ff7b7b;
-    --text: #eef6ff;
-    --muted: #a6c0da;
-    --shadow: 0 10px 28px rgba(0,0,0,0.35);
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    color: var(--text);
-    background:
-      radial-gradient(circle at top, rgba(89,195,255,0.14), transparent 30%),
-      linear-gradient(180deg, #16344d 0%, #0b1520 100%);
-    min-height: 100vh;
-  }
-  button, input, select { font: inherit; }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 12px; }
-  .topbar {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-  .panel {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
-  .panelHeader {
-    padding: 10px 12px;
-    font-weight: 700;
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    border-bottom: 1px solid var(--line);
-  }
-  .panelBody { padding: 12px; }
-  .resourceGrid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-  }
-  .resCard {
-    background: var(--panel2);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 8px;
-    min-height: 62px;
-  }
-  .resLabel { font-size: 12px; color: var(--muted); }
-  .resValue { font-size: 20px; font-weight: 700; margin-top: 3px; }
-  .resSub { font-size: 11px; color: var(--muted); margin-top: 4px; }
-  .controls { display: flex; flex-wrap: wrap; gap: 8px; }
-  .btn {
-    background: linear-gradient(180deg, #1f5685, #153c5c);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 10px;
-    padding: 9px 12px;
-    cursor: pointer;
-    transition: transform 0.08s ease, filter 0.12s ease;
-  }
-  .btn:hover { filter: brightness(1.08); }
-  .btn:active { transform: translateY(1px) scale(0.99); }
-  .btn.alt { background: linear-gradient(180deg, #645228, #44371a); }
-  .btn.green { background: linear-gradient(180deg, #2d7b57, #1d5a40); }
-  .btn.red { background: linear-gradient(180deg, #8b3d3d, #622d2d); }
-  .btn.ghost { background: linear-gradient(180deg, #324151, #23303d); }
-  .btn:disabled { opacity: 0.5; cursor: default; }
-  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-  .tabBtn { flex: 1 1 140px; }
-  .tabBtn.active { outline: 2px solid var(--gold); }
-  .grid2 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 12px; }
-  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .card {
-    background: var(--panel2);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 10px;
-    position: relative;
-  }
-  .title { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
-  .muted { color: var(--muted); }
-  .small { font-size: 12px; }
-  .tiny { font-size: 11px; }
-  .list { display: grid; gap: 8px; }
-  .crewRow, .shopRow, .fruitRow {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 10px;
-    align-items: center;
-  }
-  .portrait, .enemyPortrait {
-    width: 58px; height: 58px; border-radius: 12px;
-    display: grid; place-items: center; font-size: 28px;
-    border: 1px solid rgba(255,255,255,0.14);
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12), transparent 50%), linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.16));
-  }
-  .battleBox {
-    min-height: 330px;
-    background:
-      linear-gradient(180deg, rgba(89,195,255,0.12), transparent 30%),
-      linear-gradient(180deg, rgba(255,209,102,0.08), transparent 25%),
-      linear-gradient(180deg, #102337, #0d1826);
-    overflow: hidden;
-  }
-  .battleScene { position: relative; min-height: 240px; padding: 10px; }
-  .islandBadge {
-    display: inline-flex; align-items: center; gap: 8px;
-    border-radius: 999px; padding: 6px 10px;
-    background: rgba(255,255,255,0.08); border: 1px solid var(--line);
-    font-size: 12px;
-  }
-  .hpBar {
-    height: 12px; border-radius: 999px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.08);
-    overflow: hidden;
-  }
-  .hpFill { height: 100%; background: linear-gradient(90deg, #f65252, #ffcc66); width: 50%; }
-  .enemyArena {
-    display: grid; place-items: center;
-    min-height: 155px;
-    position: relative;
-  }
-  .enemySprite {
-    width: 120px; height: 120px; border-radius: 24px;
-    display: grid; place-items: center; font-size: 56px;
-    background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.18), transparent 30%), linear-gradient(180deg, #254466, #15263a);
-    border: 1px solid rgba(255,255,255,0.14);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.3);
-    animation: floaty 3.1s ease-in-out infinite;
-  }
-  @keyframes floaty { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-5px);} }
-  .battleControls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-  .log {
-    max-height: 170px; overflow: auto; padding-right: 6px;
-    display: grid; gap: 6px;
-  }
-  .logEntry {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 8px;
-    padding: 6px 8px;
-    font-size: 12px;
-    color: #dbeafd;
-  }
-  .popupLayer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-  .popup {
-    position: absolute; font-weight: 700; color: var(--gold);
-    text-shadow: 0 2px 8px rgba(0,0,0,0.55);
-    animation: pop 1s ease forwards;
-    white-space: nowrap;
-  }
-  @keyframes pop {
-    0% { opacity: 0; transform: translateY(10px) scale(0.6); }
-    10% { opacity: 1; }
-    100% { opacity: 0; transform: translateY(-45px) scale(1.08); }
-  }
-  .particle {
-    position: absolute; width: 8px; height: 8px; border-radius: 50%;
-    background: radial-gradient(circle, #fff2a6, #ffb347);
-    animation: burst 0.8s ease forwards;
-  }
-  @keyframes burst {
-    0% { opacity: 0.9; transform: translate(0,0) scale(1); }
-    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3); }
-  }
-  .sectionTitle { font-size: 16px; font-weight: 700; margin: 0 0 8px; }
-  .compact .panelBody { padding: 9px; }
-  .compact .resCard { padding: 7px; min-height: 56px; }
-  .compact .resValue { font-size: 17px; }
-  .compact .title { font-size: 16px; }
-  .compact .btn { padding: 8px 10px; }
-  .compact .battleBox { min-height: 280px; }
-  .hide { display: none !important; }
-  .footerNote { text-align: center; color: var(--muted); font-size: 12px; margin: 12px 0 4px; }
-  @media (max-width: 900px) {
-    .topbar, .grid2, .grid3 { grid-template-columns: 1fr; }
-    .resourceGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  }
-  @media (max-width: 600px) {
-    .wrap { padding: 8px; }
-    .tabs { gap: 6px; }
-    .tabBtn { flex: 1 1 calc(50% - 6px); }
-    .resourceGrid { grid-template-columns: 1fr 1fr; gap: 6px; }
-    .crewRow, .shopRow, .fruitRow { grid-template-columns: 52px 1fr auto; gap: 8px; }
-    .portrait, .enemyPortrait { width: 52px; height: 52px; font-size: 25px; }
-    .enemySprite { width: 100px; height: 100px; font-size: 48px; }
-  }
+/* ===== GOOGLE FONTS ===== */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap');
+
+/* ===== CSS VARIABLES ===== */
+:root {
+  --bg-deep:    #0a0c14;
+  --bg-panel:   #111527;
+  --bg-card:    #1a1f35;
+  --bg-hover:   #232843;
+  --gold:       #f5c842;
+  --gold-dark:  #c89a10;
+  --red:        #e03030;
+  --red-dark:   #a01818;
+  --blue:       #2979ff;
+  --blue-light: #82b1ff;
+  --teal:       #00bcd4;
+  --purple:     #9c27b0;
+  --green:      #43a047;
+  --orange:     #ff6d00;
+  --text-main:  #e8eaf6;
+  --text-sub:   #90a4ae;
+  --text-dim:   #546e7a;
+  --border:     rgba(245,200,66,0.18);
+  --shadow:     0 4px 32px rgba(0,0,0,0.55);
+  --radius:     10px;
+  --font-title: 'Cinzel Decorative', serif;
+  --font-body:  'Nunito', sans-serif;
+}
+
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg-deep); color: var(--text-main); font-family: var(--font-body); overflow-x: hidden; }
+
+/* ===== BACKGROUND OCEAN ===== */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(0,60,120,0.35) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(150,80,0,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, rgba(10,12,20,1) 0%, rgba(5,8,18,1) 100%);
+  pointer-events: none;
+}
+
+/* ===== WAVES ANIMATION ===== */
+.ocean-bg {
+  position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.wave {
+  position: absolute; bottom: 0; width: 200%; height: 100%;
+  background: repeating-linear-gradient(90deg, transparent 0px, transparent 40px, rgba(0,100,200,0.07) 40px, rgba(0,100,200,0.07) 80px);
+  animation: waveMove 8s linear infinite;
+}
+.wave:nth-child(2) { animation-delay: -4s; animation-duration: 12s; opacity: 0.5; }
+@keyframes waveMove { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+/* ===== LAYOUT ===== */
+#app { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh; max-width: 1280px; margin: 0 auto; padding: 0 8px; }
+
+/* ===== HEADER ===== */
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px 10px;
+  border-bottom: 2px solid var(--border);
+  background: linear-gradient(90deg, rgba(10,12,20,0.98) 0%, rgba(17,21,39,0.95) 100%);
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { font-family: var(--font-title); font-size: 1.45rem; color: var(--gold); text-shadow: 0 0 18px rgba(245,200,66,0.55); letter-spacing: 1px; }
+.logo span { color: var(--red); }
+
+/* ===== RESOURCES BAR ===== */
+.resources-bar {
+  display: flex; gap: 18px; flex-wrap: wrap; align-items: center;
+}
+.res { display: flex; align-items: center; gap: 5px; font-size: 0.82rem; font-weight: 700; }
+.res-icon { font-size: 1.1rem; }
+.res-val { color: var(--gold); font-size: 0.9rem; }
+.res-rate { color: var(--text-sub); font-size: 0.7rem; }
+
+/* ===== TABS ===== */
+.tabs {
+  display: flex; gap: 4px; padding: 10px 0 0;
+  border-bottom: 2px solid var(--border);
+  background: rgba(10,12,20,0.6);
+  position: sticky; top: 58px; z-index: 99;
+  overflow-x: auto;
+}
+.tab-btn {
+  padding: 8px 20px; cursor: pointer; border: none; background: transparent;
+  color: var(--text-sub); font-family: var(--font-body); font-size: 0.88rem; font-weight: 700;
+  border-bottom: 3px solid transparent; margin-bottom: -2px;
+  transition: all 0.2s; white-space: nowrap; letter-spacing: 0.5px;
+  border-radius: 8px 8px 0 0;
+}
+.tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.04); }
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); background: rgba(245,200,66,0.06); }
+.tab-btn .tab-icon { margin-right: 6px; }
+
+/* ===== CONTENT PANELS ===== */
+.tab-panel { display: none; padding: 16px 4px; }
+.tab-panel.active { display: block; }
+
+/* ===== GRID LAYOUTS ===== */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.sidebar-layout { display: grid; grid-template-columns: 320px 1fr; gap: 14px; }
+@media (max-width: 900px) {
+  .two-col, .three-col, .sidebar-layout { grid-template-columns: 1fr; }
+}
+
+/* ===== CARD ===== */
+.card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow);
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: rgba(245,200,66,0.32); }
+.card-title {
+  font-family: var(--font-title); font-size: 0.85rem; color: var(--gold);
+  margin-bottom: 12px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;
+}
+.card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ===== BUTTONS ===== */
+.btn {
+  padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer;
+  font-family: var(--font-body); font-size: 0.83rem; font-weight: 700;
+  transition: all 0.18s; letter-spacing: 0.3px; position: relative; overflow: hidden;
+}
+.btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(255,255,255,0.12); opacity: 0; transition: opacity 0.18s;
+}
+.btn:hover::after { opacity: 1; }
+.btn:active { transform: scale(0.97); }
+.btn-gold { background: linear-gradient(135deg, var(--gold-dark), var(--gold)); color: #0a0c14; }
+.btn-red  { background: linear-gradient(135deg, var(--red-dark), var(--red)); color: #fff; }
+.btn-blue { background: linear-gradient(135deg, #1565c0, var(--blue)); color: #fff; }
+.btn-green{ background: linear-gradient(135deg, #2e7d32, var(--green)); color: #fff; }
+.btn-purple{ background: linear-gradient(135deg, #6a1b9a, var(--purple)); color: #fff; }
+.btn-teal { background: linear-gradient(135deg, #00838f, var(--teal)); color: #fff; }
+.btn-sm   { padding: 5px 12px; font-size: 0.77rem; }
+.btn-lg   { padding: 11px 24px; font-size: 0.95rem; }
+.btn-full { width: 100%; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn:disabled::after { display: none; }
+
+/* ===== PROGRESS BARS ===== */
+.progress-wrap { background: rgba(0,0,0,0.4); border-radius: 6px; overflow: hidden; height: 10px; }
+.progress-bar {
+  height: 100%; border-radius: 6px;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(245,200,66,0.4);
+}
+.progress-bar.hp  { background: linear-gradient(90deg, #b71c1c, var(--red)); box-shadow: 0 0 8px rgba(224,48,48,0.4); }
+.progress-bar.xp  { background: linear-gradient(90deg, #1565c0, var(--blue)); box-shadow: 0 0 8px rgba(41,121,255,0.35); }
+.progress-bar.haki{ background: linear-gradient(90deg, #4a148c, var(--purple)); box-shadow: 0 0 8px rgba(156,39,176,0.4); }
+
+/* ===== CREW MEMBER CARD ===== */
+.crew-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px; transition: all 0.2s;
+  position: relative; overflow: hidden;
+}
+.crew-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+}
+.crew-card.locked { opacity: 0.5; filter: grayscale(0.6); }
+.crew-card.locked::before { background: var(--text-dim); }
+.crew-avatar {
+  width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 2rem; flex-shrink: 0;
+  border: 2px solid var(--border); background: rgba(0,0,0,0.4);
+}
+.crew-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.crew-info { flex: 1; }
+.crew-name { font-weight: 800; font-size: 0.95rem; margin-bottom: 2px; }
+.crew-role { color: var(--text-sub); font-size: 0.72rem; letter-spacing: 0.5px; }
+.crew-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 8px 0; }
+.stat { font-size: 0.72rem; color: var(--text-sub); }
+.stat strong { color: var(--text-main); }
+.level-badge {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(245,200,66,0.18); color: var(--gold);
+  font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 20px;
+  border: 1px solid rgba(245,200,66,0.3);
+}
+
+/* ===== COMBAT AREA ===== */
+.combat-arena {
+  background: linear-gradient(135deg, rgba(10,12,20,0.9) 0%, rgba(20,15,35,0.9) 100%);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px; min-height: 220px; position: relative;
+}
+.fighters { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.fighter { text-align: center; flex: 1; }
+.fighter-avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.8rem; margin: 0 auto 8px;
+  border: 3px solid var(--gold); background: rgba(0,0,0,0.5);
+  box-shadow: 0 0 20px rgba(245,200,66,0.25);
+  animation: floatFighter 3s ease-in-out infinite;
+}
+.fighter.enemy .fighter-avatar {
+  border-color: var(--red); box-shadow: 0 0 20px rgba(224,48,48,0.25);
+  animation-delay: -1.5s;
+}
+@keyframes floatFighter { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.vs-badge {
+  font-family: var(--font-title); font-size: 1.4rem; color: var(--gold);
+  text-shadow: 0 0 12px rgba(245,200,66,0.6); flex-shrink: 0;
+}
+.fighter-name { font-weight: 800; font-size: 0.88rem; margin-bottom: 6px; }
+.fighter-hp-label { font-size: 0.7rem; color: var(--text-sub); margin-bottom: 4px; }
+
+/* ===== COMBAT LOG ===== */
+.combat-log {
+  background: rgba(0,0,0,0.35); border-radius: 8px;
+  padding: 10px 12px; height: 90px; overflow-y: auto;
+  font-size: 0.73rem; line-height: 1.7; border: 1px solid rgba(255,255,255,0.05);
+}
+.log-entry { animation: fadeInLog 0.3s ease; }
+.log-entry.dmg-player { color: var(--red); }
+.log-entry.dmg-enemy  { color: var(--gold); }
+.log-entry.heal       { color: var(--green); }
+.log-entry.special    { color: var(--blue-light); }
+.log-entry.system     { color: var(--text-sub); }
+@keyframes fadeInLog { from { opacity:0; transform: translateX(-6px); } to { opacity:1; transform: none; } }
+
+/* ===== FLOATING DAMAGE NUMBERS ===== */
+.dmg-popup {
+  position: absolute; pointer-events: none; font-weight: 900;
+  font-size: 1.1rem; z-index: 200;
+  animation: popupFly 1.2s ease-out forwards;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+}
+@keyframes popupFly {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  60%  { opacity: 1; transform: translateY(-38px) scale(1.15); }
+  100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
+}
+
+/* ===== UPGRADE ITEM ===== */
+.upgrade-item {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+  transition: border-color 0.2s;
+}
+.upgrade-item:hover { border-color: rgba(245,200,66,0.32); }
+.upgrade-icon { font-size: 1.6rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.upgrade-text { flex: 1; }
+.upgrade-name { font-weight: 800; font-size: 0.85rem; margin-bottom: 2px; }
+.upgrade-desc { color: var(--text-sub); font-size: 0.72rem; }
+.upgrade-cost { color: var(--gold); font-size: 0.78rem; font-weight: 700; margin-top: 3px; }
+.upgrade-count { color: var(--teal); font-size: 0.7rem; font-weight: 700; }
+
+/* ===== DEVIL FRUIT CARD ===== */
+.df-card {
+  background: var(--bg-card); border: 2px solid transparent; border-radius: 12px;
+  padding: 16px; text-align: center; cursor: pointer; transition: all 0.25s;
+  position: relative; overflow: hidden;
+}
+.df-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 12px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.df-card.paramecia { border-color: rgba(41,121,255,0.45); }
+.df-card.zoan      { border-color: rgba(67,160,71,0.45); }
+.df-card.logia     { border-color: rgba(255,109,0,0.45); }
+.df-card.owned { opacity: 1; }
+.df-card.locked { opacity: 0.45; filter: grayscale(0.7); cursor: default; }
+.df-fruit-icon { font-size: 2.8rem; margin-bottom: 8px; display: block; }
+.df-name { font-weight: 800; font-size: 0.9rem; margin-bottom: 4px; }
+.df-type-badge {
+  display: inline-block; padding: 2px 9px; border-radius: 20px;
+  font-size: 0.65rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px;
+}
+.df-type-badge.paramecia { background: rgba(41,121,255,0.2); color: var(--blue-light); }
+.df-type-badge.zoan      { background: rgba(67,160,71,0.2); color: #81c784; }
+.df-type-badge.logia     { background: rgba(255,109,0,0.2); color: #ffab40; }
+.df-effect { color: var(--text-sub); font-size: 0.72rem; line-height: 1.5; }
+.df-cost   { color: var(--gold); font-size: 0.78rem; font-weight: 700; margin-top: 8px; }
+
+/* ===== HAKI TAB ===== */
+.haki-sphere {
+  width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center; font-size: 2.8rem;
+  position: relative; cursor: pointer; transition: transform 0.1s;
+}
+.haki-sphere:hover { transform: scale(1.06); }
+.haki-sphere:active { transform: scale(0.96); }
+.haki-sphere.conqueror {
+  background: radial-gradient(circle, rgba(100,0,150,0.8), rgba(50,0,80,0.95));
+  box-shadow: 0 0 30px rgba(156,39,176,0.6), 0 0 60px rgba(156,39,176,0.2);
+  border: 2px solid rgba(156,39,176,0.6);
+}
+.haki-sphere.armament {
+  background: radial-gradient(circle, rgba(20,20,20,0.9), rgba(5,5,10,0.98));
+  box-shadow: 0 0 30px rgba(100,100,120,0.5), 0 0 60px rgba(80,80,100,0.2);
+  border: 2px solid rgba(150,150,180,0.4);
+}
+.haki-sphere.observation {
+  background: radial-gradient(circle, rgba(0,80,150,0.8), rgba(0,30,80,0.95));
+  box-shadow: 0 0 30px rgba(0,150,255,0.5), 0 0 60px rgba(0,100,200,0.2);
+  border: 2px solid rgba(0,150,255,0.4);
+}
+.haki-sphere-pulse {
+  animation: hakiPulse 2s ease-in-out infinite;
+}
+@keyframes hakiPulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(156,39,176,0.6), 0 0 60px rgba(156,39,176,0.2); }
+  50%       { box-shadow: 0 0 50px rgba(156,39,176,0.9), 0 0 90px rgba(156,39,176,0.4); }
+}
+
+/* ===== SHIP TAB ===== */
+.ship-display {
+  text-align: center; padding: 20px;
+  font-size: 5rem; line-height: 1;
+  animation: shipSway 4s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(245,200,66,0.3));
+}
+@keyframes shipSway {
+  0%,100% { transform: rotate(-2deg) translateY(0); }
+  50%      { transform: rotate(2deg) translateY(-8px); }
+}
+
+/* ===== PRESTIGE ===== */
+.prestige-card {
+  background: linear-gradient(135deg, rgba(80,0,80,0.3) 0%, rgba(20,10,40,0.6) 100%);
+  border: 2px solid rgba(156,39,176,0.5); border-radius: 14px; padding: 20px;
+  text-align: center;
+}
+.prestige-icon { font-size: 3.5rem; margin-bottom: 12px; display: block; }
+.prestige-title {
+  font-family: var(--font-title); font-size: 1.1rem; color: var(--purple);
+  margin-bottom: 8px; text-shadow: 0 0 15px rgba(156,39,176,0.5);
+}
+
+/* ===== NOTIFICATION TOAST ===== */
+.toast-container { position: fixed; top: 70px; right: 16px; z-index: 500; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  background: var(--bg-card); border: 1px solid var(--gold);
+  border-radius: 8px; padding: 10px 16px; font-size: 0.82rem; font-weight: 700;
+  max-width: 280px; box-shadow: var(--shadow); color: var(--gold);
+  animation: toastIn 0.35s ease, toastOut 0.35s ease 2.65s forwards;
+}
+@keyframes toastIn  { from { opacity:0; transform: translateX(60px); } to { opacity:1; transform: none; } }
+@keyframes toastOut { to   { opacity:0; transform: translateX(60px); } }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb { background: rgba(245,200,66,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(245,200,66,0.5); }
+
+/* ===== MISC UTILS ===== */
+.flex { display: flex; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.mb-8  { margin-bottom: 8px; }
+.mb-12 { margin-bottom: 12px; }
+.mb-16 { margin-bottom: 16px; }
+.text-gold   { color: var(--gold); }
+.text-red    { color: var(--red); }
+.text-blue   { color: var(--blue-light); }
+.text-green  { color: var(--green); }
+.text-sub    { color: var(--text-sub); }
+.text-center { text-align: center; }
+.bold        { font-weight: 800; }
+.small       { font-size: 0.75rem; }
+.chip {
+  display: inline-block; padding: 2px 8px; border-radius: 12px;
+  font-size: 0.68rem; font-weight: 800; letter-spacing: 0.5px;
+  background: rgba(245,200,66,0.12); color: var(--gold);
+  border: 1px solid rgba(245,200,66,0.25);
+}
+.chip.red    { background: rgba(224,48,48,0.12); color: var(--red); border-color: rgba(224,48,48,0.25); }
+.chip.blue   { background: rgba(41,121,255,0.12); color: var(--blue-light); border-color: rgba(41,121,255,0.25); }
+.chip.purple { background: rgba(156,39,176,0.12); color: #ce93d8; border-color: rgba(156,39,176,0.25); }
+.chip.green  { background: rgba(67,160,71,0.12); color: #81c784; border-color: rgba(67,160,71,0.25); }
+.section-title {
+  font-family: var(--font-title); font-size: 0.78rem; color: var(--text-sub);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+.idle-glow { animation: idleGlow 2s ease-in-out infinite alternate; }
+@keyframes idleGlow { from { filter: brightness(1); } to { filter: brightness(1.3) drop-shadow(0 0 8px rgba(245,200,66,0.5)); } }
+.spin { animation: spin 2s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Bounty display */
+.bounty-banner {
+  background: linear-gradient(135deg, rgba(180,140,0,0.15), rgba(100,80,0,0.1));
+  border: 1px solid rgba(245,200,66,0.3); border-radius: 8px; padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.bounty-amount { font-family: var(--font-title); font-size: 1.1rem; color: var(--gold); }
+
+/* Island progress */
+.island-item {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px; display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: all 0.2s;
+}
+.island-item:hover { border-color: rgba(245,200,66,0.4); background: var(--bg-hover); }
+.island-item.active-island { border-color: var(--gold); background: rgba(245,200,66,0.06); }
+.island-item.locked { opacity: 0.4; cursor: default; pointer-events: none; }
+.island-icon { font-size: 1.8rem; }
+.island-name { font-weight: 800; font-size: 0.88rem; }
+.island-desc { color: var(--text-sub); font-size: 0.7rem; }
+.island-reward { color: var(--gold); font-size: 0.7rem; font-weight: 700; }
+
+/* Tabs scrollable on small screens */
+.tab-panel { animation: panelFade 0.25s ease; }
+@keyframes panelFade { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: none; } }
 </style>
 </head>
 <body>
-<div class="wrap" id="app">
-  <div class="topbar">
-    <div class="panel">
-      <div class="panelHeader">Grand Line Idle · Captain's Ledger</div>
-      <div class="panelBody">
-        <div class="resourceGrid">
-          <div class="resCard"><div class="resLabel">💰 Beli</div><div class="resValue" id="beliVal">0</div><div class="resSub" id="beliRate">+0/s</div></div>
-          <div class="resCard"><div class="resLabel">🏴 Bounty</div><div class="resValue" id="bountyVal">0</div><div class="resSub">Crew renown and challenge unlocks</div></div>
-          <div class="resCard"><div class="resLabel">💎 Treasure</div><div class="resValue" id="treasureVal">0</div><div class="resSub">Ship upgrades and deep sea loot</div></div>
-          <div class="resCard"><div class="resLabel">✨ Haki Fragments</div><div class="resValue" id="hakiVal">0</div><div class="resSub">Permanent Haki training</div></div>
-          <div class="resCard"><div class="resLabel">📜 Poneglyph Shards</div><div class="resValue" id="shardVal">0</div><div class="resSub">Prestige currency</div></div>
-          <div class="resCard"><div class="resLabel">⚓ Sea Power</div><div class="resValue" id="powerVal">0</div><div class="resSub">Crew + Ship + Haki battle strength</div></div>
-        </div>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="panelHeader">Controls</div>
-      <div class="panelBody">
-        <div class="controls" style="margin-bottom:8px;">
-          <button class="btn ghost" id="compactBtn">Compact: Off</button>
-          <button class="btn ghost" id="saveBtn">Save</button>
-          <button class="btn ghost" id="exportBtn">Export</button>
-          <button class="btn ghost" id="importBtn">Import</button>
-          <button class="btn red" id="resetBtn">Hard Reset</button>
-        </div>
-        <div class="card">
-          <div class="sectionTitle">Current Voyage</div>
-          <div class="small" id="voyageSummary">Starting out in East Blue.</div>
-          <div class="small muted" style="margin-top:6px;">Autosave is on. Offline progress is enabled.</div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="tabs">
-    <button class="btn tabBtn active" data-tab="crew">Crew</button>
-    <button class="btn tabBtn" data-tab="ship">Ship</button>
-    <button class="btn tabBtn" data-tab="haki">Haki</button>
-    <button class="btn tabBtn" data-tab="fruits">Devil Fruits</button>
-  </div>
-
-  <div id="tab-crew" class="tabContent">
-    <div class="grid2">
-      <div class="panel battleBox">
-        <div class="panelHeader">Battle Route</div>
-        <div class="panelBody battleScene" id="battleScene">
-          <div style="display:flex; justify-content:space-between; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
-            <div class="islandBadge" id="islandBadge">🏝️ Dawn Island · East Blue</div>
-            <div class="small muted" id="enemyTypeText">Island encounter</div>
-          </div>
-          <div class="card" style="margin-bottom:10px;">
-            <div style="display:flex; justify-content:space-between; gap:8px; align-items:center;">
-              <div>
-                <div class="title" id="enemyName">Bandit Scout</div>
-                <div class="small muted" id="enemyMeta">Lv 1 foe</div>
-              </div>
-              <div class="enemyPortrait" id="enemyPortrait">🗡️</div>
-            </div>
-            <div class="small" style="margin-top:8px;" id="enemyFlavor">A small-time rogue preying on rookie pirates.</div>
-            <div class="hpBar" style="margin-top:8px;"><div class="hpFill" id="enemyHpFill"></div></div>
-            <div class="small muted" id="enemyHpText" style="margin-top:5px;">HP 0 / 0</div>
-          </div>
-          <div class="enemyArena">
-            <div class="enemySprite" id="enemySprite">🗡️</div>
-            <div class="popupLayer" id="popupLayer"></div>
-          </div>
-          <div class="battleControls">
-            <button class="btn green" id="attackBtn">Attack</button>
-            <button class="btn" id="skillBtn">Crew Skill</button>
-            <button class="btn alt" id="bossBtn">Challenge Boss</button>
-            <button class="btn ghost" id="backBtn">Back to Islands</button>
-            <button class="btn ghost" id="nextIslandBtn">Next Island</button>
-          </div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panelHeader">Captain's Log</div>
-        <div class="panelBody">
-          <div class="log" id="battleLog"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid2" style="margin-top:12px;">
-      <div class="panel">
-        <div class="panelHeader">Recruit Crew</div>
-        <div class="panelBody"><div class="list" id="crewRecruitList"></div></div>
-      </div>
-      <div class="panel">
-        <div class="panelHeader">Active Crew</div>
-        <div class="panelBody"><div class="list" id="ownedCrewList"></div></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="tab-ship" class="tabContent hide">
-    <div class="grid2">
-      <div class="panel">
-        <div class="panelHeader">Shipyard</div>
-        <div class="panelBody"><div class="list" id="shipList"></div></div>
-      </div>
-      <div class="panel">
-        <div class="panelHeader">Navigation</div>
-        <div class="panelBody">
-          <div class="card" style="margin-bottom:10px;">
-            <div class="sectionTitle">Route Progress</div>
-            <div class="small" id="routeText">Clear island bosses to push deeper into the Grand Line.</div>
-          </div>
-          <div class="card">
-            <div class="sectionTitle">Automation</div>
-            <div class="small" id="automationText">Your crew attacks automatically every second.</div>
-            <div class="small muted" style="margin-top:8px;">Ship upgrades increase attack speed, treasure yield, and offline gains.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="tab-haki" class="tabContent hide">
-    <div class="grid2">
-      <div class="panel">
-        <div class="panelHeader">Haki Training</div>
-        <div class="panelBody"><div class="list" id="hakiList"></div></div>
-      </div>
-      <div class="panel">
-        <div class="panelHeader">Advanced Mastery</div>
-        <div class="panelBody">
-          <div class="card" style="margin-bottom:10px;">
-            <div class="sectionTitle">Current Multipliers</div>
-            <div class="small" id="multiplierText">No bonuses yet.</div>
-          </div>
-          <div class="card">
-            <div class="sectionTitle">Prestige · New World Legacy</div>
-            <div class="small" id="prestigeHint">Reach higher total bounty to earn Poneglyph Shards on reset.</div>
-            <div class="controls" style="margin-top:10px;"><button class="btn alt" id="prestigeBtn">Sail Into the New World</button></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="tab-fruits" class="tabContent hide">
-    <div class="grid2">
-      <div class="panel">
-        <div class="panelHeader">Devil Fruit Vault</div>
-        <div class="panelBody"><div class="list" id="fruitList"></div></div>
-      </div>
-      <div class="panel">
-        <div class="panelHeader">Fruit Effects</div>
-        <div class="panelBody">
-          <div class="card" style="margin-bottom:10px;">
-            <div class="sectionTitle">Equipped Fruit</div>
-            <div class="small" id="equippedFruitText">None equipped.</div>
-          </div>
-          <div class="card">
-            <div class="sectionTitle">How Fruits Work</div>
-            <div class="small">Defeat stronger foes to discover rare fruits. Equipping one grants a powerful bonus. Some affect click damage, some boost idle income, and some help boss clears.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="footerNote">Single-file fan game · Progress saves locally in your browser</div>
+<!-- Ocean background waves -->
+<div class="ocean-bg">
+  <div class="wave"></div>
+  <div class="wave"></div>
 </div>
 
+<!-- Toast notification container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<div id="app">
+  <!-- ===== HEADER ===== -->
+  <header>
+    <div class="logo">☠️ <span>ONE PIECE</span> IDLE RPG</div>
+    <div class="resources-bar" id="resourcesBar">
+      <!-- Populated by JS -->
+    </div>
+  </header>
+
+  <!-- ===== TABS ===== -->
+  <nav class="tabs" id="tabNav">
+    <button class="tab-btn active" data-tab="crew">
+      <span class="tab-icon">⚔️</span>Crew
+    </button>
+    <button class="tab-btn" data-tab="combat">
+      <span class="tab-icon">💀</span>Combat
+    </button>
+    <button class="tab-btn" data-tab="ship">
+      <span class="tab-icon">⛵</span>Ship
+    </button>
+    <button class="tab-btn" data-tab="haki">
+      <span class="tab-icon">🔮</span>Haki
+    </button>
+    <button class="tab-btn" data-tab="devilfruits">
+      <span class="tab-icon">🍎</span>Devil Fruits
+    </button>
+    <button class="tab-btn" data-tab="islands">
+      <span class="tab-icon">🏝️</span>Islands
+    </button>
+    <button class="tab-btn" data-tab="prestige">
+      <span class="tab-icon">👑</span>Prestige
+    </button>
+  </nav>
+
+  <!-- ===================== CREW TAB ===================== -->
+  <div class="tab-panel active" id="tab-crew">
+    <div class="two-col">
+      <!-- Left: Crew roster -->
+      <div>
+        <div class="bounty-banner">
+          <span style="font-size:1.5rem">📋</span>
+          <div>
+            <div class="small text-sub">YOUR BOUNTY</div>
+            <div class="bounty-amount" id="bountyDisplay">฿0</div>
+          </div>
+        </div>
+        <p class="section-title">⚔️ Your Crew</p>
+        <div id="crewRoster" style="display:flex;flex-direction:column;gap:10px;">
+          <!-- Crew cards rendered by JS -->
+        </div>
+      </div>
+      <!-- Right: Upgrades -->
+      <div>
+        <p class="section-title">🔧 Crew Upgrades</p>
+        <div id="crewUpgrades" style="display:flex;flex-direction:column;gap:8px;">
+          <!-- Upgrades rendered by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== COMBAT TAB ===================== -->
+  <div class="tab-panel" id="tab-combat">
+    <div class="sidebar-layout">
+      <!-- Left: Arena -->
+      <div>
+        <div class="combat-arena" id="combatArena">
+          <div class="fighters">
+            <!-- Player -->
+            <div class="fighter" id="playerFighter">
+              <div class="fighter-avatar" id="playerAvatar">🏴‍☠️</div>
+              <div class="fighter-name" id="playerName">Monkey D. Luffy</div>
+              <div class="fighter-hp-label">HP: <span id="playerHP">1000</span> / <span id="playerMaxHP">1000</span></div>
+              <div class="progress-wrap" style="max-width:160px;margin:0 auto">
+                <div class="progress-bar hp" id="playerHPBar" style="width:100%"></div>
+              </div>
+            </div>
+            <div class="vs-badge">VS</div>
+            <!-- Enemy -->
+            <div class="fighter enemy" id="enemyFighter">
+              <div class="fighter-avatar" id="enemyAvatar">💀</div>
+              <div class="fighter-name" id="enemyName">East Blue Pirate</div>
+              <div class="fighter-hp-label">HP: <span id="enemyHP">500</span> / <span id="enemyMaxHP">500</span></div>
+              <div class="progress-wrap" style="max-width:160px;margin:0 auto">
+                <div class="progress-bar hp" id="enemyHPBar" style="width:100%"></div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;">
+            <div class="small text-sub">Auto-battle active</div>
+            <div id="battleSpeedDisplay" class="chip">Speed: 1x</div>
+          </div>
+        </div>
+
+        <!-- Combat log -->
+        <div class="card" style="margin-top:12px;">
+          <div class="card-title">📜 Battle Log</div>
+          <div class="combat-log" id="combatLog">
+            <div class="log-entry system">▶ Battle begins on the Grand Line...</div>
+          </div>
+        </div>
+
+        <!-- Combat controls -->
+        <div class="card" style="margin-top:12px;">
+          <div class="card-title">⚡ Special Attacks</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;" id="specialAttackBtns">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Enemy selection + Stats -->
+      <div>
+        <div class="card mb-12">
+          <div class="card-title">🎯 Choose Your Enemy</div>
+          <div id="enemyList" style="display:flex;flex-direction:column;gap:8px;">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+
+        <div class="card mb-12">
+          <div class="card-title">📊 Battle Stats</div>
+          <div id="battleStats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">⚡ Speed Boosts</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-blue btn-sm" onclick="game.setBattleSpeed(1)">1x</button>
+            <button class="btn btn-blue btn-sm" onclick="game.setBattleSpeed(2)">2x</button>
+            <button class="btn btn-blue btn-sm" onclick="game.setBattleSpeed(4)">4x</button>
+            <button class="btn btn-gold btn-sm" onclick="game.setBattleSpeed(8)">8x 🔥</button>
+          </div>
+          <div class="small text-sub" style="margin-top:8px;">Higher speed unlocked via Ship upgrades</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SHIP TAB ===================== -->
+  <div class="tab-panel" id="tab-ship">
+    <div class="two-col">
+      <div>
+        <div class="card" style="text-align:center;">
+          <div class="ship-display" id="shipEmoji">⛵</div>
+          <div style="font-family:var(--font-title);font-size:1.1rem;color:var(--gold);" id="shipName">Dinghy</div>
+          <div class="small text-sub mt-4" id="shipDesc" style="margin-top:6px;">A small wooden boat</div>
+          <div style="margin-top:12px;display:flex;justify-content:center;gap:16px;">
+            <div><div class="small text-sub">Speed</div><div class="bold text-gold" id="shipSpeed">1x</div></div>
+            <div><div class="small text-sub">Capacity</div><div class="bold text-gold" id="shipCap">5</div></div>
+            <div><div class="small text-sub">Defense</div><div class="bold text-gold" id="shipDef">+0%</div></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <div class="card-title">⚓ Ship Upgrades</div>
+          <div id="shipUpgradeList" style="display:flex;flex-direction:column;gap:8px;">
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card mb-12">
+          <div class="card-title">🚢 Ship Tier</div>
+          <div id="shipTierList" style="display:flex;flex-direction:column;gap:8px;">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📦 Cargo Hold</div>
+          <div id="cargoInfo" style="font-size:0.82rem;line-height:2;">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== HAKI TAB ===================== -->
+  <div class="tab-panel" id="tab-haki">
+    <div class="three-col">
+      <!-- Conqueror's Haki -->
+      <div class="card" style="text-align:center;">
+        <div class="haki-sphere conqueror haki-sphere-pulse" id="hakiConqBtn" onclick="game.useHaki('conqueror')">
+          👑
+        </div>
+        <div style="font-family:var(--font-title);font-size:0.85rem;color:#ce93d8;margin-bottom:4px;">Conqueror's Haki</div>
+        <div class="small text-sub mb-12">Haoshoku no Haki</div>
+        <div class="progress-wrap mb-8">
+          <div class="progress-bar haki" id="conqBar" style="width:0%"></div>
+        </div>
+        <div class="small text-gold" id="conqXP">XP: 0 / 100</div>
+        <div class="small text-sub mb-12" id="conqLvl">Level 0</div>
+        <div style="font-size:0.78rem;color:var(--text-sub);line-height:1.6;margin-bottom:12px;" id="conqEffect">
+          Stuns all enemies for 3s. Passive: 5% Beli/s bonus per level.
+        </div>
+        <div id="conqUpgrades" style="display:flex;flex-direction:column;gap:6px;text-align:left;">
+        </div>
+      </div>
+
+      <!-- Armament Haki -->
+      <div class="card" style="text-align:center;">
+        <div class="haki-sphere armament" id="hakiArmBtn" onclick="game.useHaki('armament')">
+          ⚫
+        </div>
+        <div style="font-family:var(--font-title);font-size:0.85rem;color:#b0bec5;margin-bottom:4px;">Armament Haki</div>
+        <div class="small text-sub mb-12">Busoshoku no Haki</div>
+        <div class="progress-wrap mb-8">
+          <div class="progress-bar haki" id="armBar" style="width:0%"></div>
+        </div>
+        <div class="small text-gold" id="armXP">XP: 0 / 100</div>
+        <div class="small text-sub mb-12" id="armLvl">Level 0</div>
+        <div style="font-size:0.78rem;color:var(--text-sub);line-height:1.6;margin-bottom:12px;" id="armEffect">
+          Coats attacks. Passive: +10% ATK per level.
+        </div>
+        <div id="armUpgrades" style="display:flex;flex-direction:column;gap:6px;text-align:left;">
+        </div>
+      </div>
+
+      <!-- Observation Haki -->
+      <div class="card" style="text-align:center;">
+        <div class="haki-sphere observation" id="hakiObsBtn" onclick="game.useHaki('observation')">
+          👁️
+        </div>
+        <div style="font-family:var(--font-title);font-size:0.85rem;color:#82b1ff;margin-bottom:4px;">Observation Haki</div>
+        <div class="small text-sub mb-12">Kenbunshoku no Haki</div>
+        <div class="progress-wrap mb-8">
+          <div class="progress-bar haki" id="obsBar" style="width:0%"></div>
+        </div>
+        <div class="small text-gold" id="obsXP">XP: 0 / 100</div>
+        <div class="small text-sub mb-12" id="obsLvl">Level 0</div>
+        <div style="font-size:0.78rem;color:var(--text-sub);line-height:1.6;margin-bottom:12px;" id="obsEffect">
+          Predicts attacks. Passive: +8% evasion & +5% Beli per level.
+        </div>
+        <div id="obsUpgrades" style="display:flex;flex-direction:column;gap:6px;text-align:left;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Haki Training -->
+    <div class="card" style="margin-top:14px;">
+      <div class="card-title">🏋️ Haki Training</div>
+      <div class="two-col">
+        <div>
+          <p class="small text-sub mb-8">Train your Haki passively. Each battle grants Haki XP based on your training level.</p>
+          <div id="hakiTrainingUpgrades" style="display:flex;flex-direction:column;gap:8px;">
+          </div>
+        </div>
+        <div>
+          <p class="small text-sub mb-8">Click the Haki spheres above to use them in battle. Each use costs Stamina and grants XP.</p>
+          <div class="card" style="background:rgba(0,0,0,0.3);">
+            <div class="small text-sub mb-8">Stamina</div>
+            <div class="progress-wrap mb-8">
+              <div class="progress-bar" id="staminaBar" style="width:100%;background:linear-gradient(90deg,#2e7d32,var(--green));"></div>
+            </div>
+            <div class="flex-between small">
+              <span class="text-green" id="staminaVal">100 / 100</span>
+              <span class="text-sub">Regen: <span class="text-green" id="staminaRegen">+1/s</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== DEVIL FRUITS TAB ===================== -->
+  <div class="tab-panel" id="tab-devilfruits">
+    <div class="card mb-12">
+      <div class="card-title">🍎 Devil Fruit Collection</div>
+      <div class="small text-sub mb-12">Eating a Devil Fruit grants powerful abilities but you lose the ability to swim. You can only eat one fruit at a time.</div>
+      <div id="dfEquipped" class="bounty-banner">
+        <span style="font-size:1.5rem">🍎</span>
+        <div>
+          <div class="small text-sub">CURRENTLY EQUIPPED</div>
+          <div class="bold" id="dfEquippedName">None — Eat a Devil Fruit below!</div>
+        </div>
+      </div>
+    </div>
+    <div id="devilFruitGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+
+  <!-- ===================== ISLANDS TAB ===================== -->
+  <div class="tab-panel" id="tab-islands">
+    <div class="two-col">
+      <div>
+        <p class="section-title">🗺️ Grand Line Route</p>
+        <div id="islandList" style="display:flex;flex-direction:column;gap:8px;">
+          <!-- Islands rendered by JS -->
+        </div>
+      </div>
+      <div>
+        <div class="card mb-12" id="activeIslandCard">
+          <div class="card-title">🏝️ Current Island</div>
+          <div id="islandDetail">
+            <div class="text-center" style="padding:20px;">
+              <div style="font-size:3rem;">🌊</div>
+              <div class="text-sub small mt-4">Select an island to explore</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🏆 Island Rewards</div>
+          <div id="islandRewards" class="small text-sub">Clear islands to earn Treasure and unlock new enemies.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PRESTIGE TAB ===================== -->
+  <div class="tab-panel" id="tab-prestige">
+    <div class="two-col">
+      <div>
+        <div class="prestige-card mb-12">
+          <span class="prestige-icon">👑</span>
+          <div class="prestige-title">The Will of D.</div>
+          <p class="small text-sub mb-12" style="line-height:1.7;">
+            Reset your journey on the Grand Line to awaken greater power. Each prestige grants permanent bonuses that make your next voyage faster and stronger.
+          </p>
+          <div class="flex-between mb-12">
+            <div>
+              <div class="small text-sub">Prestige Count</div>
+              <div class="bold text-gold" id="prestigeCount" style="font-size:1.3rem;">0</div>
+            </div>
+            <div>
+              <div class="small text-sub">Total D. Coins</div>
+              <div class="bold" id="dCoins" style="color:#ce93d8;font-size:1.3rem;">0 🪙</div>
+            </div>
+            <div>
+              <div class="small text-sub">This Run</div>
+              <div class="bold text-gold" id="prestigeEarnable">0 🪙</div>
+            </div>
+          </div>
+          <p class="small text-sub mb-8">Requirement: Reach <strong class="text-gold">Raftel</strong> or accumulate <strong class="text-gold">฿1 Billion</strong> Beli</p>
+          <button class="btn btn-purple btn-full btn-lg" id="prestigeBtn" onclick="game.prestige()" disabled>
+            🌊 Set Sail Again (Prestige)
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📜 Prestige History</div>
+          <div id="prestigeHistory" class="small text-sub" style="line-height:2;">
+            No prestige yet. Sail the Grand Line!
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card mb-12">
+          <div class="card-title">🪙 D. Coin Upgrades</div>
+          <p class="small text-sub mb-12">Permanent upgrades purchased with D. Coins. These survive prestige!</p>
+          <div id="dCoinUpgrades" style="display:flex;flex-direction:column;gap:8px;">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📊 Prestige Bonuses (Active)</div>
+          <div id="prestigeBonusDisplay" style="font-size:0.8rem;line-height:2.2;color:var(--text-sub);">
+            No bonuses yet.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
 <script>
-(function () {
-  'use strict';
+// ============================================================
+// ONE PIECE IDLE RPG — GAME ENGINE
+// ============================================================
 
-  var SAVE_KEY = 'grand_line_idle_rebuild_v1';
-  var now = function(){ return Date.now(); };
+// ===== UTILITY FUNCTIONS =====
+const $ = id => document.getElementById(id);
+const fmt = n => {
+  if (n >= 1e12) return (n/1e12).toFixed(2) + 'T';
+  if (n >= 1e9)  return (n/1e9).toFixed(2) + 'B';
+  if (n >= 1e6)  return (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e3)  return (n/1e3).toFixed(1) + 'K';
+  return Math.floor(n).toString();
+};
+const fmtBeli = n => '฿' + fmt(n);
+const clamp = (v,mn,mx) => Math.max(mn, Math.min(mx, v));
+const lerp = (a,b,t) => a + (b-a)*t;
+const rand = (mn,mx) => mn + Math.random()*(mx-mn);
+const randInt = (mn,mx) => Math.floor(rand(mn,mx+1));
+const chance = p => Math.random() < p;
 
-  var islands = [
-    { name: 'Dawn Island', sea: 'East Blue', icon: '🏝️', enemyScale: 1.0, bossScale: 5.5, flavor: 'Rookie waters with rough bandits and restless beasts.' },
-    { name: 'Orange Town', sea: 'East Blue', icon: '🎪', enemyScale: 1.8, bossScale: 7.0, flavor: 'Circus pirates stir chaos among the streets.' },
-    { name: 'Syrup Village', sea: 'East Blue', icon: '🌳', enemyScale: 3.2, bossScale: 8.8, flavor: 'A quiet village with hidden danger along the shore.' },
-    { name: 'Baratie', sea: 'East Blue', icon: '🍽️', enemyScale: 5.4, bossScale: 10.8, flavor: 'A floating restaurant where fierce fighters gather.' },
-    { name: 'Arlong Park', sea: 'East Blue', icon: '🦈', enemyScale: 9.5, bossScale: 13.5, flavor: 'Fish-men and tyrants challenge your rise.' },
-    { name: 'Loguetown', sea: 'East Blue', icon: '⚡', enemyScale: 14.0, bossScale: 16.5, flavor: 'The town of beginnings and endings crackles with danger.' },
-    { name: 'Whisky Peak', sea: 'Grand Line', icon: '🏜️', enemyScale: 22.0, bossScale: 20.0, flavor: 'Bounty hunters lurk behind every smile.' },
-    { name: 'Alabasta', sea: 'Grand Line', icon: '🐪', enemyScale: 33.0, bossScale: 24.0, flavor: 'A kingdom in the sand, torn by secret war.' },
-    { name: 'Skypiea', sea: 'Grand Line', icon: '☁️', enemyScale: 49.0, bossScale: 29.0, flavor: 'Heavenly foes strike from above.' },
-    { name: 'Water 7', sea: 'Grand Line', icon: '🚂', enemyScale: 72.0, bossScale: 35.0, flavor: 'Shipwrights, spies, and relentless assassins await.' },
-    { name: 'Thriller Bark', sea: 'Grand Line', icon: '👻', enemyScale: 108.0, bossScale: 42.0, flavor: 'A drifting nightmare haunted by monstrous shadows.' },
-    { name: 'Sabaody', sea: 'Grand Line', icon: '🫧', enemyScale: 162.0, bossScale: 50.0, flavor: 'Supernovas, slavers, and chaos on the archipelago.' },
-    { name: 'Dressrosa', sea: 'New World', icon: '🦩', enemyScale: 240.0, bossScale: 60.0, flavor: 'A smiling kingdom with deadly secrets below the surface.' },
-    { name: 'Whole Cake', sea: 'New World', icon: '🍰', enemyScale: 360.0, bossScale: 74.0, flavor: 'Sweet lands guarded by terrifying power.' },
-    { name: 'Wano', sea: 'New World', icon: '🗻', enemyScale: 540.0, bossScale: 90.0, flavor: 'Samurai, beasts, and thunderous duels define this land.' }
-  ];
+// ===== GAME STATE =====
+const DEFAULT_STATE = {
+  beli:       0,
+  beliBps:    0, // beli per second (computed)
+  treasure:   0,
+  bounty:     0,
+  stamina:    100,
+  maxStamina: 100,
+  battleSpeed:1,
+  totalTime:  0,
+  prestige: {
+    count:    0,
+    dCoins:   0,
+    history:  [],
+    upgrades: { belimult:0, crewcap:0, hakistart:0, startbeli:0, speedstart:0 }
+  },
+  haki: {
+    conqueror:   { level:0, xp:0 },
+    armament:    { level:0, xp:0 },
+    observation: { level:0, xp:0 },
+    training:    { passive:0, regen:0 },
+  },
+  crew: {}, // crewId -> { level, unlocked }
+  crewUpgrades: {}, // upgradeId -> count
+  ship: {
+    tier: 0,
+    upgrades: {}, // upgradeId -> count
+  },
+  devilFruit: {
+    owned: [],
+    equipped: null,
+  },
+  islands: {
+    current: 0,
+    cleared: [],
+  },
+  combat: {
+    wins: 0,
+    totalDmg: 0,
+    kills: 0,
+    currentEnemy: 0,
+  },
+};
 
-  var crewDefs = [
-    { id:'luffy', name:'Luffy', icon:'👒', cost:30, baseDps:1.2, baseClick:2.0, growth:1.22, desc:'Captain spirit. Great click damage and steady DPS.' },
-    { id:'zoro', name:'Zoro', icon:'⚔️', cost:120, baseDps:4.5, baseClick:1.0, growth:1.23, desc:'Three-sword style master focused on raw idle damage.' },
-    { id:'nami', name:'Nami', icon:'🧭', cost:280, baseDps:2.0, baseClick:0.5, growth:1.2, desc:'Navigator who boosts treasure gain as she levels.' },
-    { id:'usopp', name:'Usopp', icon:'🎯', cost:700, baseDps:7.5, baseClick:1.5, growth:1.24, desc:'Inventor and sniper, excellent sustained damage.' },
-    { id:'sanji', name:'Sanji', icon:'🦵', cost:1800, baseDps:16, baseClick:3.4, growth:1.24, desc:'Fast striker whose kicks shine against bosses.' },
-    { id:'chopper', name:'Chopper', icon:'🦌', cost:4200, baseDps:22, baseClick:2.0, growth:1.24, desc:'Doctor who also improves idle healing and reward flow.' },
-    { id:'robin', name:'Robin', icon:'📚', cost:9800, baseDps:38, baseClick:4.0, growth:1.25, desc:'Archaeologist who finds more Haki Fragments.' },
-    { id:'franky', name:'Franky', icon:'🤖', cost:24000, baseDps:72, baseClick:6.0, growth:1.25, desc:'Shipwright who amplifies ship upgrades.' },
-    { id:'brook', name:'Brook', icon:'🎻', cost:52000, baseDps:130, baseClick:11.0, growth:1.25, desc:'Soul king with stylish all-around damage.' },
-    { id:'jinbe', name:'Jinbe', icon:'🌊', cost:125000, baseDps:220, baseClick:18.0, growth:1.26, desc:'Helmsman whose control improves boss damage.' }
-  ];
+// ===== DATA DEFINITIONS =====
 
-  var shipDefs = [
-    { id:'hull', name:'Reinforced Hull', baseCost:25, currency:'treasure', growth:1.65, desc:'+15% max offline time value and +10% rewards.', effect:function(l){ return { rewardMul: 1 + l*0.10, offlineMul:1 + l*0.15 }; } },
-    { id:'cannons', name:'Cannon Battery', baseCost:20, currency:'treasure', growth:1.7, desc:'+20% idle DPS per level.', effect:function(l){ return { dpsMul: 1 + l*0.20 }; } },
-    { id:'sails', name:'Swift Sails', baseCost:35, currency:'treasure', growth:1.72, desc:'+8% auto attack speed per level.', effect:function(l){ return { speedMul: 1 + l*0.08 }; } },
-    { id:'logpose', name:'Grand Line Log Pose', baseCost:80, currency:'treasure', growth:1.75, desc:'+12% treasure gain per level.', effect:function(l){ return { treasureMul: 1 + l*0.12 }; } },
-    { id:'workshop', name:'Dock Workshop', baseCost:150, currency:'treasure', growth:1.8, desc:'+15% crew level efficiency per level.', effect:function(l){ return { crewMul: 1 + l*0.15 }; } }
-  ];
+// ---- CREW ----
+const CREW_DATA = [
+  { id:'luffy',   name:'Monkey D. Luffy',  role:'Captain',          emoji:'🏴‍☠️', color:'#e03030',
+    base:{ atk:80, def:20, hp:1000 },
+    perLevel:{ atk:30, def:8, hp:200 },
+    passive:'Gum-Gum Power: +15% all Beli gain',
+    unlockCost:0, unlockCurrency:'beli', description:'Captain of the Straw Hat Pirates!',
+    ability:'Gum-Gum Pistol' },
+  { id:'zoro',    name:'Roronoa Zoro',      role:'Swordsman',        emoji:'⚔️', color:'#43a047',
+    base:{ atk:120, def:30, hp:900 },
+    perLevel:{ atk:45, def:12, hp:180 },
+    passive:'Three Sword Style: +25% ATK',
+    unlockCost:500, unlockCurrency:'beli', description:'Pirate Hunter turned Straw Hat first mate.',
+    ability:'Oni Giri' },
+  { id:'nami',    name:'Nami',              role:'Navigator',        emoji:'🗺️', color:'#ff9800',
+    base:{ atk:30, def:15, hp:600 },
+    perLevel:{ atk:15, def:6, hp:120 },
+    passive:'Perfect Forecast: +20% Beli/s idle income',
+    unlockCost:1200, unlockCurrency:'beli', description:'Thief and navigator with a knack for Beli.',
+    ability:'Clima Tact' },
+  { id:'usopp',   name:'Usopp',             role:'Sniper',           emoji:'🎯', color:'#795548',
+    base:{ atk:60, def:10, hp:700 },
+    perLevel:{ atk:20, def:5, hp:140 },
+    passive:'Sniper King: +10% crit chance',
+    unlockCost:2500, unlockCurrency:'beli', description:'Brave warrior of the sea.',
+    ability:'Kabuto' },
+  { id:'sanji',   name:'Sanji',             role:'Cook',             emoji:'🍳', color:'#1565c0',
+    base:{ atk:110, def:25, hp:850 },
+    perLevel:{ atk:40, def:10, hp:170 },
+    passive:'Black Leg: +20% ATK, restores 2% HP/kill',
+    unlockCost:5000, unlockCurrency:'beli', description:'The cook who fights with his legs.',
+    ability:"Hell Memories" },
+  { id:'chopper', name:'Tony Tony Chopper',  role:'Doctor',           emoji:'🦌', color:'#e91e63',
+    base:{ atk:40, def:40, hp:800 },
+    perLevel:{ atk:18, def:16, hp:200 },
+    passive:'Rumble Ball: +30% HP regen',
+    unlockCost:8000, unlockCurrency:'beli', description:'The little doctor with a big heart.',
+    ability:'Monster Point' },
+  { id:'robin',   name:'Nico Robin',         role:'Archaeologist',    emoji:'📚', color:'#9c27b0',
+    base:{ atk:70, def:20, hp:750 },
+    perLevel:{ atk:25, def:8, hp:150 },
+    passive:'Hana Hana: +15% Treasure from islands',
+    unlockCost:15000, unlockCurrency:'beli', description:'Seeks the Poneglyph of history.',
+    ability:'Cien Fleur' },
+  { id:'franky',  name:'Franky',             role:'Shipwright',       emoji:'🔧', color:'#0097a7',
+    base:{ atk:90, def:60, hp:1100 },
+    perLevel:{ atk:35, def:22, hp:220 },
+    passive:'Super: +40% ship upgrade effect',
+    unlockCost:30000, unlockCurrency:'beli', description:'Cyborg shipwright of the crew.',
+    ability:'Franky Cannon' },
+  { id:'brook',   name:'Brook',              role:'Musician',         emoji:'🎻', color:'#78909c',
+    base:{ atk:80, def:15, hp:680 },
+    perLevel:{ atk:28, def:7, hp:136 },
+    passive:'Yomi Yomi: Revive once per battle with 30% HP',
+    unlockCost:60000, unlockCurrency:'beli', description:'Soul King and Straw Hat musician.',
+    ability:'Soul Solid' },
+  { id:'jinbei',  name:'Jinbe',              role:'Helmsman',         emoji:'🐟', color:'#1a237e',
+    base:{ atk:130, def:80, hp:1400 },
+    perLevel:{ atk:50, def:30, hp:280 },
+    passive:'Fish-Man Karate: +15% battle speed, -20% damage taken',
+    unlockCost:200000, unlockCurrency:'beli', description:'Knight of the Sea. Former Warlord.',
+    ability:'Vagabond Drill' },
+];
 
-  var hakiDefs = [
-    { id:'armament', name:'Armament Haki', baseCost:12, growth:1.75, desc:'+18% click damage per level.', effect:function(l){ return { clickMul: 1 + l*0.18 }; } },
-    { id:'observation', name:'Observation Haki', baseCost:16, growth:1.78, desc:'+16% critical hit chance and +10% boss rewards per level.', effect:function(l){ return { critBonus: l*0.16, bossRewardMul: 1 + l*0.10 }; } },
-    { id:'conqueror', name:'Conqueror\'s Haki', baseCost:25, growth:1.83, desc:'+22% all damage per level.', effect:function(l){ return { allDamageMul: 1 + l*0.22 }; } },
-    { id:'flow', name:'Advanced Flow', baseCost:40, growth:1.88, desc:'+15% Haki Fragment gain per level.', effect:function(l){ return { hakiMul: 1 + l*0.15 }; } }
-  ];
+// ---- CREW UPGRADES ----
+const CREW_UPGRADES = [
+  { id:'training',  name:'Combat Training',   emoji:'🥊', desc:'+10% ATK for all crew',   baseCost:200,  costMult:1.5, maxLevel:20, effect:'atk',     value:0.1 },
+  { id:'medkit',    name:'Medical Supplies',   emoji:'💊', desc:'+8% Max HP for all crew',  baseCost:300,  costMult:1.5, maxLevel:20, effect:'hp',      value:0.08 },
+  { id:'treasure',  name:'Treasure Hunting',   emoji:'💰', desc:'+15% Beli per battle win', baseCost:500,  costMult:1.7, maxLevel:15, effect:'beliWin', value:0.15 },
+  { id:'idlemine',  name:'Idle Mining',         emoji:'⛏️', desc:'+10% idle Beli/s',        baseCost:1000, costMult:1.6, maxLevel:25, effect:'idleBeli',value:0.1 },
+  { id:'navmap',    name:'Navigation Maps',     emoji:'🗺️', desc:'+20% EXP gain',           baseCost:800,  costMult:1.6, maxLevel:15, effect:'xp',      value:0.2 },
+  { id:'armor',     name:'Crew Armor',          emoji:'🛡️', desc:'+12% DEF for all crew',   baseCost:1500, costMult:1.7, maxLevel:20, effect:'def',     value:0.12 },
+  { id:'morale',    name:'Crew Morale',         emoji:'🎉', desc:'+5% all stats',            baseCost:5000, costMult:2.0, maxLevel:10, effect:'all',     value:0.05 },
+  { id:'autoLevel', name:'Auto Leveling',       emoji:'⬆️', desc:'Crew level up faster',    baseCost:10000,costMult:2.2, maxLevel:5,  effect:'autoLvl', value:1 },
+];
 
-  var fruitDefs = [
-    { id:'gomu', name:'Gum-Gum Fruit', icon:'🍎', cost:0, unlockBounty:0, desc:'+80% click damage. A classic rubbery power.', effect:{ clickMul:1.8 } },
-    { id:'mera', name:'Flame-Flame Fruit', icon:'🔥', cost:80, unlockBounty:2500, desc:'+100% skill burst damage and +25% all damage.', effect:{ skillMul:2.0, allDamageMul:1.25 } },
-    { id:'goro', name:'Rumble-Rumble Fruit', icon:'⚡', cost:180, unlockBounty:12000, desc:'+55% idle DPS and +15% crit chance.', effect:{ dpsMul:1.55, critBonus:0.15 } },
-    { id:'ope', name:'Op-Op Fruit', icon:'🫀', cost:480, unlockBounty:45000, desc:'+100% bounty gain and +40% boss damage.', effect:{ bountyMul:2.0, bossDamageMul:1.4 } },
-    { id:'mochi', name:'Mochi Fruit', icon:'🍡', cost:1200, unlockBounty:180000, desc:'+85% all damage and +30% attack speed.', effect:{ allDamageMul:1.85, speedMul:1.30 } }
-  ];
+// ---- ENEMIES ----
+const ENEMIES = [
+  { id:'bandit',    name:'East Blue Bandit',    emoji:'🗡️',  hp:400,   atk:18,  def:5,  beli:[30,60],    xp:10,  bounty:500,    island:0 },
+  { id:'marine',    name:'Marine Soldier',       emoji:'⚓',   hp:700,   atk:28,  def:12, beli:[80,140],   xp:18,  bounty:1000,   island:0 },
+  { id:'buggy',     name:'Buggy Pirate',         emoji:'🤡',  hp:1200,  atk:40,  def:15, beli:[150,250],  xp:30,  bounty:3000,   island:1 },
+  { id:'krieg',     name:'Don Krieg',            emoji:'⚙️',  hp:2500,  atk:60,  def:25, beli:[300,500],  xp:50,  bounty:8000,   island:1 },
+  { id:'arlong',    name:'Arlong',               emoji:'🦈',  hp:4000,  atk:90,  def:35, beli:[500,900],  xp:80,  bounty:20000,  island:2 },
+  { id:'smoker',    name:'Captain Smoker',       emoji:'💨',  hp:6000,  atk:120, def:50, beli:[800,1400], xp:120, bounty:35000,  island:2 },
+  { id:'crocodile', name:'Crocodile',            emoji:'🐊',  hp:12000, atk:180, def:70, beli:[2000,3500],xp:200, bounty:80000,  island:3 },
+  { id:'enel',      name:'Enel',                 emoji:'⚡',  hp:20000, atk:250, def:90, beli:[4000,7000],xp:320, bounty:150000, island:4 },
+  { id:'lucci',     name:'Rob Lucci',            emoji:'🐆',  hp:35000, atk:350, def:120,beli:[7000,12000],xp:500,bounty:300000, island:5 },
+  { id:'moria',     name:'Gecko Moria',          emoji:'👥',  hp:60000, atk:500, def:150,beli:[12000,20000],xp:800,bounty:500000,island:6 },
+  { id:'kizaru',    name:'Admiral Kizaru',       emoji:'✨',  hp:100000,atk:700, def:200,beli:[20000,35000],xp:1200,bounty:800000,island:7 },
+  { id:'kaido',     name:'Kaido of the Beasts',  emoji:'🐲',  hp:500000,atk:1500,def:500,beli:[100000,200000],xp:5000,bounty:5000000,island:8 },
+  { id:'bm',        name:'Big Mom',              emoji:'🍬',  hp:400000,atk:1200,def:400,beli:[80000,160000],xp:4000,bounty:4000000,island:8 },
+  { id:'blackbeard',name:'Blackbeard',           emoji:'⚫',  hp:800000,atk:2000,def:600,beli:[200000,400000],xp:8000,bounty:9000000,island:9 },
+];
 
-  var enemyPools = {
-    normal: [
-      ['Bandit Scout','🗡️','A small-time rogue preying on rookie pirates.'],
-      ['Marine Trainee','⚓','An eager marine testing your growing reputation.'],
-      ['Wild Sea Beast','🦈','A raging predator from shallow waters.'],
-      ['Wanted Pirate','🏴','A notorious outlaw hunting treasure.'],
-      ['Devil Fruit Raider','🍇','A dangerous fighter with unstable powers.']
-    ],
-    boss: [
-      ['Island Tyrant','👑','A ruthless ruler holding the island in fear.'],
-      ['Fish-Man Enforcer','🦈','A brutal specialist with crushing force.'],
-      ['Cipher Agent','🎭','A lethal assassin with polished technique.'],
-      ['Warlord Remnant','🗿','A monstrous veteran from the old age of pirates.'],
-      ['Emperor Officer','🐉','A terrifying commander from the New World.']
-    ]
-  };
+// ---- SHIPS ----
+const SHIP_TIERS = [
+  { id:'dinghy',   name:'Dinghy',       emoji:'🛶', speed:1,  cap:5,  def:0,   cost:0,      desc:'A small wooden boat, barely seaworthy.' },
+  { id:'caravel',  name:'Caravel',      emoji:'⛵', speed:1.5,cap:8,  def:5,   cost:2000,   desc:'A reliable sailing vessel.' },
+  { id:'galleon',  name:'Galleon',      emoji:'🚢', speed:2,  cap:15, def:12,  cost:15000,  desc:'A grand sailing ship.' },
+  { id:'ironclad', name:'Iron Clad',    emoji:'🛳️', speed:3,  cap:25, def:25,  cost:100000, desc:'Steel-reinforced hull with steam power.' },
+  { id:'merry',    name:'Going Merry',  emoji:'🐏', speed:4,  cap:35, def:35,  cost:500000, desc:'The beloved Straw Hat sheep-headed ship.' },
+  { id:'sunny',    name:'Thousand Sunny',emoji:'☀️',speed:6, cap:50, def:55,  cost:2000000,desc:'The Straw Hats\' dream ship, built with Treasure Wood.' },
+  { id:'pluton',   name:'Ancient Pluton',emoji:'⚔️',speed:10,cap:100,def:100,cost:10000000,desc:'An ancient warship of legendary power.' },
+];
 
-  function defaultState() {
-    var crew = {};
-    for (var i=0;i<crewDefs.length;i++) {
-      crew[crewDefs[i].id] = { owned:false, level:0 };
-    }
-    var ship = {}, haki = {}, fruits = {};
-    for (i=0;i<shipDefs.length;i++) ship[shipDefs[i].id] = 0;
-    for (i=0;i<hakiDefs.length;i++) haki[hakiDefs[i].id] = 0;
-    for (i=0;i<fruitDefs.length;i++) fruits[fruitDefs[i].id] = false;
-    fruits.gomu = true;
-    return {
-      version: 2,
-      beli: 50,
-      bounty: 0,
-      treasure: 0,
-      hakiFragments: 0,
-      shards: 0,
-      seaPower: 0,
-      crew: crew,
-      ship: ship,
-      haki: haki,
-      fruits: fruits,
-      equippedFruit: 'gomu',
-      compact: window.innerWidth < 700,
-      currentTab: 'crew',
-      islandIndex: 0,
-      highestIsland: 0,
-      fightingBoss: false,
-      bossUnlocked: false,
-      enemy: null,
-      enemyHp: 0,
-      enemyMaxHp: 0,
-      critFlash: 0,
-      lastTick: now(),
-      lastSave: now(),
-      autoAttackCharge: 0,
-      skillCooldownUntil: 0,
-      skillCharge: 0,
-      totalKills: 0,
-      totalClicks: 0,
-      totalPrestiges: 0,
-      totalBeliEarned: 0,
-      totalDamageDone: 0,
-      lastOpened: now(),
-      log: []
-    };
+const SHIP_UPGRADES = [
+  { id:'sail',    name:'Reinforced Sails',  emoji:'🌬️', desc:'+0.3 battle speed per level', baseCost:1000,  costMult:1.6, maxLevel:10, effect:'speed', value:0.3 },
+  { id:'hull',    name:'Hull Armor',         emoji:'🔩', desc:'+8% crew DEF per level',      baseCost:1500,  costMult:1.65,maxLevel:10, effect:'def',   value:0.08 },
+  { id:'cannon',  name:'Ship Cannons',       emoji:'💣', desc:'+15% battle start ATK burst',  baseCost:3000,  costMult:1.8, maxLevel:8,  effect:'burst', value:0.15 },
+  { id:'kitchen', name:'Chef\'s Kitchen',    emoji:'🍳', desc:'+12% idle Beli/s',            baseCost:5000,  costMult:1.9, maxLevel:10, effect:'idle',  value:0.12 },
+  { id:'library', name:'Ship Library',       emoji:'📚', desc:'+10% all XP gain',            baseCost:8000,  costMult:2.0, maxLevel:8,  effect:'xp',    value:0.1 },
+  { id:'aquarium',name:'Fish-Man Aquarium',  emoji:'🐠', desc:'+5% stamina regen/level',     baseCost:20000, costMult:2.2, maxLevel:5,  effect:'stam',  value:0.05 },
+];
+
+// ---- DEVIL FRUITS ----
+const DEVIL_FRUITS = [
+  { id:'gomu',    name:'Gomu Gomu no Mi',  type:'paramecia', emoji:'🍑', effect:'Rubber body: immune to blunt. +20% ATK, +30% HP.',  cost:5000,   multipliers:{atk:1.2,hp:1.3} },
+  { id:'bara',    name:'Bara Bara no Mi',  type:'paramecia', emoji:'🍊', effect:'Can split apart. +15% DEF, immune to slash damage.', cost:8000,   multipliers:{def:1.15} },
+  { id:'sube',    name:'Sube Sube no Mi',  type:'paramecia', emoji:'🍋', effect:'Slippery skin. +25% evasion, +10% Beli gain.',       cost:12000,  multipliers:{beli:1.1} },
+  { id:'bane',    name:'Bane Bane no Mi',  type:'paramecia', emoji:'🍏', effect:'Spring legs. +20% ATK speed bonus.',                  cost:15000,  multipliers:{atk:1.2} },
+  { id:'tori',    name:'Tori Tori no Mi',  type:'zoan',      emoji:'🦅', effect:'Falcon form. +30% ATK, +20% SPD.',                   cost:25000,  multipliers:{atk:1.3,speed:1.2} },
+  { id:'ushi',    name:'Ushi Ushi no Mi',  type:'zoan',      emoji:'🐂', effect:'Bison form. +50% HP, +25% DEF.',                     cost:30000,  multipliers:{hp:1.5,def:1.25} },
+  { id:'hito',    name:'Hito Hito no Mi',  type:'zoan',      emoji:'👤', effect:'Human form. +20% all stats.',                        cost:50000,  multipliers:{atk:1.2,def:1.2,hp:1.2} },
+  { id:'mera',    name:'Mera Mera no Mi',  type:'logia',     emoji:'🔥', effect:'Fire body. +40% ATK, elemental immunity.',            cost:100000, multipliers:{atk:1.4} },
+  { id:'hie',     name:'Hie Hie no Mi',   type:'logia',     emoji:'🧊', effect:'Ice body. Freeze enemies. +35% ATK, +25% DEF.',      cost:120000, multipliers:{atk:1.35,def:1.25} },
+  { id:'goro',    name:'Goro Goro no Mi',  type:'logia',     emoji:'⚡', effect:'Lightning. +60% ATK, stun chance 20%.',              cost:200000, multipliers:{atk:1.6} },
+  { id:'yami',    name:'Yami Yami no Mi',  type:'logia',     emoji:'🌑', effect:'Darkness. +50% ATK, nullify enemy fruit effects.',   cost:500000, multipliers:{atk:1.5,beli:1.3} },
+  { id:'hana',    name:'Hana Hana no Mi',  type:'paramecia', emoji:'🌸', effect:'Flower arms. +25% ATK, hit multiple enemies.',       cost:80000,  multipliers:{atk:1.25,beli:1.15} },
+  { id:'ope',     name:'Ope Ope no Mi',    type:'paramecia', emoji:'💊', effect:'Room & SHAMBLES. +30% all. -30% enemy DEF.',         cost:300000, multipliers:{atk:1.3,def:1.3,hp:1.3} },
+  { id:'suna',    name:'Suna Suna no Mi',  type:'logia',     emoji:'🏜️', effect:'Sand. Desiccate foes. +45% ATK, dry field aura.',   cost:150000, multipliers:{atk:1.45} },
+  { id:'gura',    name:'Gura Gura no Mi',  type:'paramecia', emoji:'💥', effect:'Tremor. Quake force. +80% ATK, +AoE damage.',        cost:1000000,multipliers:{atk:1.8,beli:1.5} },
+];
+
+// ---- ISLANDS ----
+const ISLANDS = [
+  { id:'foosha',    name:'Foosha Village',    emoji:'🏡', desc:'Luffy\'s home. Easy enemies.',     rewardBeli:100,   rewardTreasure:0,   unlockBounty:0,       enemyIds:['bandit','marine'] },
+  { id:'orange',    name:'Orange Town',        emoji:'🎪', desc:'Buggy the Clown\'s turf.',        rewardBeli:500,   rewardTreasure:1,   unlockBounty:1000,    enemyIds:['buggy','bandit'] },
+  { id:'syrup',     name:'Syrup Village',      emoji:'🎯', desc:'Kaya\'s estate. Sniper alley.',   rewardBeli:1000,  rewardTreasure:2,   unlockBounty:3000,    enemyIds:['buggy','marine'] },
+  { id:'baratia',   name:'Baratie',            emoji:'🍴', desc:'The floating restaurant.',        rewardBeli:3000,  rewardTreasure:5,   unlockBounty:8000,    enemyIds:['krieg','marine'] },
+  { id:'arlong',    name:'Arlong Park',        emoji:'🦈', desc:'Fish-men rule this island.',      rewardBeli:8000,  rewardTreasure:10,  unlockBounty:20000,   enemyIds:['arlong','smoker'] },
+  { id:'logue',     name:'Loguetown',          emoji:'⚓', desc:'The City of the Beginning & End.',rewardBeli:20000, rewardTreasure:20,  unlockBounty:35000,   enemyIds:['smoker','marine'] },
+  { id:'alabasta',  name:'Alabasta',           emoji:'🏜️', desc:'Crocodile\'s desert kingdom.',   rewardBeli:60000, rewardTreasure:50,  unlockBounty:80000,   enemyIds:['crocodile','marine'] },
+  { id:'skypiea',   name:'Skypiea',            emoji:'☁️', desc:'Enel\'s sky island.',             rewardBeli:150000,rewardTreasure:100, unlockBounty:150000,  enemyIds:['enel','marine'] },
+  { id:'enies',     name:'Enies Lobby',        emoji:'⚖️', desc:'The Gate of Justice. CP9.',      rewardBeli:400000,rewardTreasure:200, unlockBounty:300000,  enemyIds:['lucci','smoker'] },
+  { id:'thriller',  name:'Thriller Bark',      emoji:'🎃', desc:'Moria\'s ghost ship.',            rewardBeli:800000,rewardTreasure:400, unlockBounty:500000,  enemyIds:['moria','smoker'] },
+  { id:'sabaody',   name:'Sabaody Archipelago',emoji:'🫧', desc:'The final stop before the NW.',  rewardBeli:2000000,rewardTreasure:800, unlockBounty:800000, enemyIds:['kizaru','marine'] },
+  { id:'fishman',   name:'Fish-Man Island',    emoji:'🌊', desc:'Under the sea. 10,000m deep.',   rewardBeli:5000000,rewardTreasure:1500,unlockBounty:2000000,enemyIds:['kaido','bm'] },
+  { id:'wano',      name:'Wano Country',       emoji:'🗾', desc:'Land of Samurai. Kaido\'s turf.', rewardBeli:10000000,rewardTreasure:3000,unlockBounty:5000000,enemyIds:['kaido','blackbeard'] },
+  { id:'raftel',    name:'Raftel (Laugh Tale)', emoji:'🏴‍☠️',desc:'The island at the end of the world.',rewardBeli:50000000,rewardTreasure:10000,unlockBounty:9000000,enemyIds:['blackbeard'] },
+];
+
+// ---- HAKI UPGRADES ----
+const HAKI_UPGRADES = {
+  conqueror: [
+    { id:'cq1', name:'Force of Will',     cost:500,  effect:'Stun duration +1s',       currency:'beli' },
+    { id:'cq2', name:'Royal Presence',    cost:2000, effect:'+10% passive Beli bonus',  currency:'beli' },
+    { id:'cq3', name:'Conqueror\'s Aura', cost:10000,effect:'AoE dmg on activation',    currency:'beli' },
+  ],
+  armament: [
+    { id:'ar1', name:'Iron Fist',         cost:400,  effect:'+15% ATK on coated hit',   currency:'beli' },
+    { id:'ar2', name:'Full-Body Coat',    cost:1800, effect:'+20% DEF when active',      currency:'beli' },
+    { id:'ar3', name:'Advanced Coating',  cost:9000, effect:'Bypass logia immunity',     currency:'beli' },
+  ],
+  observation: [
+    { id:'ob1', name:'Future Sight',      cost:600,  effect:'Dodge next attack 50%',     currency:'beli' },
+    { id:'ob2', name:'Empathy',           cost:2500, effect:'+8% Beli from all sources', currency:'beli' },
+    { id:'ob3', name:'Precognition',      cost:12000,effect:'+25% crit chance',          currency:'beli' },
+  ],
+};
+
+const HAKI_TRAINING_UPGRADES = [
+  { id:'ht1', name:'Sparring Sessions', emoji:'🥊', desc:'+10% Haki XP/battle',  baseCost:1000, costMult:1.8, maxLevel:10, effect:'xp',   value:0.1 },
+  { id:'ht2', name:'Meditation',        emoji:'🧘', desc:'+5% stamina regen',     baseCost:2000, costMult:2.0, maxLevel:8,  effect:'stam', value:0.05 },
+  { id:'ht3', name:'Haki Drills',       emoji:'💪', desc:'+15% all Haki levels',  baseCost:8000, costMult:2.5, maxLevel:5,  effect:'all',  value:0.15 },
+];
+
+// ---- D. COIN UPGRADES ----
+const DCOIN_UPGRADES = [
+  { id:'belimult',  name:'Wealthy Pirate',     emoji:'💰', desc:'×1.5 all Beli gain per rank',  cost:1, maxRank:10 },
+  { id:'crewcap',   name:'Nakama Bond',         emoji:'🤝', desc:'+1 crew capacity per rank',    cost:2, maxRank:5  },
+  { id:'hakistart', name:'Haki Awakening',      emoji:'🔮', desc:'Start with +5 Haki levels',   cost:3, maxRank:4  },
+  { id:'startbeli', name:'Inherited Treasure',  emoji:'💎', desc:'Start with ×10 Beli per rank', cost:2, maxRank:5  },
+  { id:'speedstart',name:'Wind in the Sails',   emoji:'⚡', desc:'+0.5 base battle speed',       cost:4, maxRank:3  },
+];
+
+// ============================================================
+// GAME ENGINE CLASS
+// ============================================================
+class Game {
+  constructor() {
+    this.state = this.loadState();
+    this.combatTimer   = 0;
+    this.idleTimer     = 0;
+    this.staminaTimer  = 0;
+    this.autoLevelTimer= 0;
+    this.lastTimestamp = Date.now();
+    this.playerHP = this.getMaxPlayerHP();
+    this.playerMaxHP = this.playerHP;
+    this.enemyHP  = 0;
+    this.enemyMaxHP=0;
+    this.currentEnemy  = null;
+    this.isBattling    = false;
+    this.hakiCooldown  = { conqueror:0, armament:0, observation:0 };
+    this.selectedEnemyId = null;
+    this.logEntries    = [];
+    this.prestigeHistory = this.state.prestige.history || [];
+    this.initEnemy();
+    this.render();
+    this.startLoop();
+    this.log('▶ Welcome to the Grand Line! Your adventure begins...', 'system');
+    this.log('💡 Tip: Fight enemies, collect Beli, recruit crew!', 'system');
   }
 
-  var state = load();
-  ensureState(state);
-
-  function ensureState(s) {
-    var d = defaultState();
-    for (var k in d) if (!(k in s)) s[k] = d[k];
-    for (var id in d.crew) if (!s.crew[id]) s.crew[id] = { owned:false, level:0 };
-    for (id in d.ship) if (typeof s.ship[id] !== 'number') s.ship[id] = 0;
-    for (id in d.haki) if (typeof s.haki[id] !== 'number') s.haki[id] = 0;
-    for (id in d.fruits) if (typeof s.fruits[id] !== 'boolean') s.fruits[id] = d.fruits[id];
-    if (!s.equippedFruit || !s.fruits[s.equippedFruit]) s.equippedFruit = 'gomu';
-    if (typeof s.log === 'undefined' || !Array.isArray(s.log)) s.log = [];
-    if (window.innerWidth < 700 && typeof s.compact !== 'boolean') s.compact = true;
-    if (typeof s.currentTab !== 'string') s.currentTab = 'crew';
-    if (!s.enemy || typeof s.enemyHp !== 'number' || s.enemyHp <= 0 || typeof s.enemyMaxHp !== 'number') spawnEnemy(false, true);
-  }
-
-  function save() {
-    state.lastOpened = now();
-    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-    state.lastSave = now();
-    addLog('Game saved.');
-  }
-
-  function load() {
+  // ===== STATE MANAGEMENT =====
+  loadState() {
     try {
-      var raw = localStorage.getItem(SAVE_KEY);
-      if (!raw) return defaultState();
-      var data = JSON.parse(raw);
-      return data || defaultState();
-    } catch (e) {
-      return defaultState();
+      const saved = localStorage.getItem('opIdleRPG_v3');
+      if (saved) return Object.assign({}, JSON.parse(JSON.stringify(DEFAULT_STATE)), JSON.parse(saved));
+    } catch(e) {}
+    return JSON.parse(JSON.stringify(DEFAULT_STATE));
+  }
+  saveState() {
+    try {
+      localStorage.setItem('opIdleRPG_v3', JSON.stringify(this.state));
+    } catch(e) {}
+  }
+
+  // ===== COMPUTED STATS =====
+  getCrewStat(stat) {
+    // Base from unlocked crew
+    let total = 0;
+    for (const cd of CREW_DATA) {
+      const cs = this.state.crew[cd.id];
+      if (!cs || !cs.unlocked) continue;
+      const lvl = cs.level || 1;
+      total += (cd.base[stat] || 0) + (cd.perLevel[stat] || 0) * (lvl - 1);
     }
+    if (total === 0 && stat === 'atk') total = 50;
+    if (total === 0 && stat === 'def') total = 10;
+    if (total === 0 && stat === 'hp')  total = 800;
+
+    // Crew upgrades
+    const crewATKBonus = this.getUpgradeCount('training', this.state.crewUpgrades) * 0.1;
+    const crewHPBonus  = this.getUpgradeCount('medkit',   this.state.crewUpgrades) * 0.08;
+    const crewDEFBonus = this.getUpgradeCount('armor',    this.state.crewUpgrades) * 0.12;
+    const moraleBonus  = this.getUpgradeCount('morale',   this.state.crewUpgrades) * 0.05;
+    if (stat === 'atk') total *= (1 + crewATKBonus + moraleBonus);
+    if (stat === 'hp')  total *= (1 + crewHPBonus  + moraleBonus);
+    if (stat === 'def') total *= (1 + crewDEFBonus + moraleBonus);
+
+    // Haki bonuses
+    const armLvl = this.state.haki.armament.level;
+    const obsLvl = this.state.haki.observation.level;
+    if (stat === 'atk') total *= (1 + armLvl * 0.1);
+    if (stat === 'def') total *= (1 + obsLvl * 0.04);
+
+    // Devil fruit
+    const df = this.getEquippedDF();
+    if (df && df.multipliers[stat]) total *= df.multipliers[stat];
+
+    // Ship DEF
+    const shipTier = SHIP_TIERS[this.state.ship.tier] || SHIP_TIERS[0];
+    const hullBonus = this.getUpgradeCount('hull', this.state.ship.upgrades) * 0.08;
+    if (stat === 'def') total *= (1 + shipTier.def/100 + hullBonus);
+
+    // Prestige permanent bonuses
+    if (stat === 'atk') total *= Math.pow(1.1, this.state.prestige.upgrades.belimult || 0);
+
+    return Math.max(1, Math.floor(total));
   }
 
-  function hardReset() {
-    if (!confirm('Hard reset all progress?')) return;
-    state = defaultState();
-    spawnEnemy(false, true);
-    saveSilently();
-    renderAll();
-    addLog('A fresh voyage begins.');
+  getMaxPlayerHP() {
+    return this.getCrewStat('hp');
   }
 
-  function saveSilently() {
-    state.lastOpened = now();
-    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-    state.lastSave = now();
+  getPlayerATK() {
+    const base = this.getCrewStat('atk');
+    const crit = chance(this.getCritChance()) ? 2 : 1;
+    const burst = this.getUpgradeCount('cannon', this.state.ship.upgrades) * 0.15;
+    return Math.floor(base * crit * (1 + burst));
   }
 
-  function format(n) {
-    if (!isFinite(n)) return '∞';
-    if (n < 1000) return Math.floor(n * 10) / 10 + '';
-    var units = ['K','M','B','T','Qa','Qi','Sx','Sp','Oc'];
-    var u = -1;
-    while (n >= 1000 && u < units.length - 1) { n /= 1000; u++; }
-    return n.toFixed(n >= 100 ? 0 : n >= 10 ? 1 : 2) + units[u];
+  getCritChance() {
+    const usopp = this.state.crew['usopp']?.unlocked ? 0.1 : 0;
+    const obs3   = this.state.haki.observation.level >= 5 ? 0.25 : 0;
+    return 0.05 + usopp + obs3;
   }
 
-  function addLog(text) {
-    state.log.unshift({ t: new Date().toLocaleTimeString(), text: text });
-    if (state.log.length > 40) state.log.length = 40;
-    renderLog();
+  getBattleSpeed() {
+    const sail = this.getUpgradeCount('sail', this.state.ship.upgrades) * 0.3;
+    const jinbei = this.state.crew['jinbei']?.unlocked ? 0.15 : 0;
+    const dcSpeed = (this.state.prestige.upgrades.speedstart || 0) * 0.5;
+    return this.state.battleSpeed * (1 + jinbei) + sail + dcSpeed;
   }
 
-  function getCrewDef(id) { return crewDefs.filter(function(c){ return c.id === id; })[0]; }
-  function getShipDef(id) { return shipDefs.filter(function(c){ return c.id === id; })[0]; }
-  function getHakiDef(id) { return hakiDefs.filter(function(c){ return c.id === id; })[0]; }
-  function getFruitDef(id) { return fruitDefs.filter(function(c){ return c.id === id; })[0]; }
-
-  function ownedCrewCount() {
-    var n=0; for (var id in state.crew) if (state.crew[id].owned) n++; return n;
+  getIdleBPS() {
+    let bps = 5; // base
+    // Nami bonus
+    if (this.state.crew['nami']?.unlocked) {
+      const namiLvl = this.state.crew['nami'].level || 1;
+      bps += 20 + namiLvl * 5;
+    }
+    // Crew idle upgrades
+    const idleBonus = this.getUpgradeCount('idlemine', this.state.crewUpgrades) * 0.1;
+    const kitchenBonus = this.getUpgradeCount('kitchen', this.state.ship.upgrades) * 0.12;
+    const obsLvl = this.state.haki.observation.level;
+    const conqLvl = this.state.haki.conqueror.level;
+    const dfBeli = (this.getEquippedDF()?.multipliers?.beli || 1);
+    const prestigeMult = Math.pow(1.5, this.state.prestige.upgrades.belimult || 0);
+    const obsBonus = obsLvl * 0.05;
+    const conqBonus = conqLvl * 0.05;
+    bps *= (1 + idleBonus + kitchenBonus + obsBonus + conqBonus);
+    bps *= dfBeli * prestigeMult;
+    this.state.beliBps = bps;
+    return bps;
   }
 
-  function crewLevelCost(def, lvl) {
-    var ownedBoost = state.crew[def.id].owned ? 1 : 1;
-    return Math.ceil(def.cost * Math.pow(def.growth, lvl) * ownedBoost);
+  getEquippedDF() {
+    if (!this.state.devilFruit.equipped) return null;
+    return DEVIL_FRUITS.find(d => d.id === this.state.devilFruit.equipped);
   }
 
-  function shipCost(def, lvl) { return Math.ceil(def.baseCost * Math.pow(def.growth, lvl)); }
-  function hakiCost(def, lvl) { return Math.ceil(def.baseCost * Math.pow(def.growth, lvl)); }
+  getUpgradeCount(id, upgradeMap) {
+    return upgradeMap[id] || 0;
+  }
 
-  function currentFruit() { return getFruitDef(state.equippedFruit); }
-  function fruitEffects() { return (currentFruit() && currentFruit().effect) ? currentFruit().effect : {}; }
+  getUnlockedCrewCount() {
+    return Object.values(this.state.crew).filter(c => c.unlocked).length;
+  }
 
-  function aggregateBonuses() {
-    var bonuses = {
-      rewardMul: 1,
-      offlineMul: 1,
-      dpsMul: 1,
-      speedMul: 1,
-      treasureMul: 1,
-      crewMul: 1,
-      clickMul: 1,
-      critBonus: 0,
-      bossRewardMul: 1,
-      allDamageMul: 1,
-      hakiMul: 1,
-      skillMul: 1,
-      bountyMul: 1,
-      bossDamageMul: 1
+  // ===== GAME LOOP =====
+  startLoop() {
+    const loop = () => {
+      const now = Date.now();
+      const dt  = Math.min((now - this.lastTimestamp) / 1000, 5); // cap delta at 5s
+      this.lastTimestamp = now;
+      this.state.totalTime += dt;
+      this.update(dt);
+      this.render();
+      requestAnimationFrame(loop);
     };
-    var i, eff, key;
-    for (i=0;i<shipDefs.length;i++) {
-      eff = shipDefs[i].effect(state.ship[shipDefs[i].id]);
-      for (key in eff) bonuses[key] = (typeof bonuses[key] === 'number' ? bonuses[key] : 1) * eff[key];
-    }
-    for (i=0;i<hakiDefs.length;i++) {
-      eff = hakiDefs[i].effect(state.haki[hakiDefs[i].id]);
-      for (key in eff) {
-        if (key === 'critBonus') bonuses[key] += eff[key]; else bonuses[key] *= eff[key];
-      }
-    }
-    var fruit = fruitEffects();
-    for (key in fruit) {
-      if (key === 'critBonus') bonuses[key] += fruit[key]; else bonuses[key] *= fruit[key];
-    }
-    var prestigeMul = 1 + state.shards * 0.12;
-    bonuses.rewardMul *= prestigeMul;
-    bonuses.dpsMul *= prestigeMul;
-    bonuses.clickMul *= prestigeMul;
-    bonuses.allDamageMul *= prestigeMul;
-    bonuses.treasureMul *= 1 + state.shards * 0.04;
-    bonuses.hakiMul *= 1 + state.shards * 0.05;
-    bonuses.bountyMul *= 1 + state.shards * 0.07;
-    bonuses.offlineMul *= 1 + state.shards * 0.05;
-    bonuses.speedMul *= 1 + state.shards * 0.02;
-    return bonuses;
-  }
-
-  function crewStats() {
-    var bonus = aggregateBonuses();
-    var dps = 0, click = 1;
-    var treasureBonus = 1, hakiBonus = 1, bossDamage = 1;
-    for (var i=0;i<crewDefs.length;i++) {
-      var def = crewDefs[i];
-      var entry = state.crew[def.id];
-      if (!entry || !entry.owned || entry.level <= 0) continue;
-      var lvl = entry.level;
-      var crewPower = Math.pow(1.16, lvl - 1) * bonus.crewMul;
-      dps += def.baseDps * lvl * crewPower;
-      click += def.baseClick * lvl * Math.pow(1.12, lvl - 1) * bonus.crewMul;
-      if (def.id === 'nami') treasureBonus *= 1 + lvl * 0.03;
-      if (def.id === 'robin') hakiBonus *= 1 + lvl * 0.03;
-      if (def.id === 'jinbe') bossDamage *= 1 + lvl * 0.035;
-    }
-    dps *= bonus.dpsMul * bonus.allDamageMul;
-    click *= bonus.clickMul * bonus.allDamageMul;
-    bossDamage *= bonus.bossDamageMul;
-    var critChance = Math.min(0.55, 0.05 + bonus.critBonus);
-    return {
-      dps: dps,
-      click: click,
-      critChance: critChance,
-      treasureBonus: treasureBonus,
-      hakiBonus: hakiBonus,
-      bossDamage: bossDamage,
-      speedMul: bonus.speedMul,
-      rewardMul: bonus.rewardMul,
-      offlineMul: bonus.offlineMul,
-      treasureMul: bonus.treasureMul,
-      hakiMul: bonus.hakiMul,
-      skillMul: bonus.skillMul,
-      bossRewardMul: bonus.bossRewardMul,
-      bountyMul: bonus.bountyMul,
-      allDamageMul: bonus.allDamageMul
-    };
-  }
-
-  function totalSeaPower() {
-    var stats = crewStats();
-    return Math.floor(stats.dps * 2 + stats.click * 4 + state.shards * 50 + totalShipLevels() * 18 + totalHakiLevels() * 25);
-  }
-
-  function totalShipLevels() { var s=0; for (var k in state.ship) s += state.ship[k]; return s; }
-  function totalHakiLevels() { var s=0; for (var k in state.haki) s += state.haki[k]; return s; }
-
-  function enemyTemplate(isBoss) {
-    var pool = isBoss ? enemyPools.boss : enemyPools.normal;
-    var row = pool[Math.floor(Math.random() * pool.length)];
-    var island = islands[state.islandIndex];
-    var depthMul = isBoss ? island.bossScale : island.enemyScale;
-    var difficulty = Math.pow(1.33, state.islandIndex) * depthMul;
-    var hp = Math.floor((25 + state.islandIndex * 14) * difficulty * (isBoss ? 6.5 : 1.4));
-    var rewardBeli = Math.floor((8 + state.islandIndex * 5) * difficulty * (isBoss ? 10 : 1.5));
-    var rewardBounty = Math.floor((1 + state.islandIndex) * difficulty * (isBoss ? 5.5 : 0.7));
-    var rewardTreasure = Math.floor((state.islandIndex + 1) * (isBoss ? 3.5 : 0.32));
-    var rewardHaki = Math.random() < (isBoss ? 0.75 : 0.12 + state.islandIndex * 0.01) ? Math.max(1, Math.floor((state.islandIndex + 1) * (isBoss ? 2.8 : 0.45))) : 0;
-    return {
-      name: row[0],
-      icon: row[1],
-      flavor: row[2],
-      level: state.islandIndex + 1 + (isBoss ? 3 : 0),
-      maxHp: hp,
-      hp: hp,
-      rewardBeli: rewardBeli,
-      rewardBounty: rewardBounty,
-      rewardTreasure: rewardTreasure,
-      rewardHaki: rewardHaki,
-      isBoss: isBoss
-    };
-  }
-
-  function spawnEnemy(isBoss, silent) {
-    state.fightingBoss = !!isBoss;
-    state.enemy = enemyTemplate(!!isBoss);
-    state.enemyHp = state.enemy.hp;
-    state.enemyMaxHp = state.enemy.maxHp;
-    if (!silent) addLog((isBoss ? 'Boss challenge!' : 'New encounter: ') + state.enemy.name + ' appears.');
-    renderBattle();
-  }
-
-  function damageEnemy(amount, source) {
-    if (!state.enemy) spawnEnemy(false, true);
-    if (state.enemyHp <= 0) return;
-    var stats = crewStats();
-    var crit = Math.random() < stats.critChance;
-    var dmg = amount * (crit ? 2 : 1);
-    if (state.enemy.isBoss) dmg *= stats.bossDamage;
-    dmg = Math.max(1, dmg);
-    state.enemyHp -= dmg;
-    state.totalDamageDone += dmg;
-    showPopup('-' + format(dmg) + (crit ? ' CRIT!' : ''), crit ? '#ffef90' : '#ffd166');
-    burstParticles();
-    if (state.enemyHp <= 0) {
-      state.enemyHp = 0;
-      killEnemy();
-    }
-    renderBattle();
-  }
-
-  function killEnemy() {
-    var e = state.enemy;
-    if (!e) return;
-    var stats = crewStats();
-    var beliGain = Math.floor(e.rewardBeli * stats.rewardMul);
-    var bountyGain = Math.floor(e.rewardBounty * stats.bountyMul);
-    var treasureGain = Math.floor(e.rewardTreasure * stats.rewardMul * stats.treasureMul * stats.treasureBonus);
-    var hakiGain = Math.floor(e.rewardHaki * stats.rewardMul * stats.hakiMul * stats.hakiBonus * (e.isBoss ? stats.bossRewardMul : 1));
-    state.beli += beliGain;
-    state.bounty += bountyGain;
-    state.treasure += treasureGain;
-    state.hakiFragments += hakiGain;
-    state.totalBeliEarned += beliGain;
-    state.totalKills += 1;
-
-    if (e.isBoss) {
-      state.bossUnlocked = true;
-      if (state.islandIndex === state.highestIsland) state.highestIsland = Math.min(islands.length - 1, state.highestIsland + 1);
-      if (state.islandIndex < islands.length - 1) state.islandIndex += 1;
-      maybeUnlockFruit();
-      addLog('Boss defeated! ' + e.name + ' falls. New island unlocked.');
-      spawnEnemy(false, true);
-    } else {
-      addLog('Defeated ' + e.name + '. +' + format(beliGain) + ' Beli, +' + format(bountyGain) + ' Bounty.');
-      spawnEnemy(false, true);
-    }
-    renderAll();
-  }
-
-  function maybeUnlockFruit() {
-    for (var i=0;i<fruitDefs.length;i++) {
-      var f = fruitDefs[i];
-      if (!state.fruits[f.id] && state.bounty >= f.unlockBounty) {
-        state.fruits[f.id] = true;
-        addLog('You discovered the ' + f.name + '!');
-        break;
-      }
-    }
-  }
-
-  function attackClick() {
-    state.totalClicks += 1;
-    damageEnemy(crewStats().click, 'click');
-  }
-
-  function useSkill() {
-    var t = now();
-    if (t < state.skillCooldownUntil) {
-      addLog('Crew Skill is still on cooldown.');
-      return;
-    }
-    var stats = crewStats();
-    var burst = stats.click * 5 * stats.skillMul + stats.dps * 1.5;
-    state.skillCooldownUntil = t + 12000;
-    addLog('Crew Skill unleashed!');
-    damageEnemy(burst, 'skill');
-  }
-
-  function challengeBoss() {
-    spawnEnemy(true, false);
-  }
-
-  function backToIslands() {
-    state.fightingBoss = false;
-    spawnEnemy(false, true);
-    addLog('You return to island skirmishes.');
-  }
-
-  function nextIsland() {
-    if (state.islandIndex < state.highestIsland) {
-      state.islandIndex += 1;
-      spawnEnemy(false, true);
-      addLog('You sail onward to ' + islands[state.islandIndex].name + '.');
-    } else {
-      addLog('Defeat the current island boss to unlock the next route.');
-    }
-  }
-
-  function prevIsland() {
-    if (state.islandIndex > 0) {
-      state.islandIndex -= 1;
-      spawnEnemy(false, true);
-      addLog('You sail back to ' + islands[state.islandIndex].name + '.');
-    } else {
-      addLog('You are already at the first island.');
-    }
-  }
-
-  function buyCrew(id) {
-    var def = getCrewDef(id), entry = state.crew[id];
-    if (!entry.owned) {
-      if (state.beli < def.cost) { addLog('Not enough Beli to recruit ' + def.name + '.'); return; }
-      state.beli -= def.cost;
-      entry.owned = true;
-      entry.level = 1;
-      addLog(def.name + ' joined your crew!');
-    } else {
-      var cost = crewLevelCost(def, entry.level);
-      if (state.beli < cost) { addLog('Not enough Beli to train ' + def.name + '.'); return; }
-      state.beli -= cost;
-      entry.level += 1;
-      addLog(def.name + ' reached level ' + entry.level + '.');
-    }
-    renderAll();
-  }
-
-  function buyShip(id) {
-    var def = getShipDef(id);
-    var lvl = state.ship[id];
-    var cost = shipCost(def, lvl);
-    if (state.treasure < cost) { addLog('Not enough Treasure for ' + def.name + '.'); return; }
-    state.treasure -= cost;
-    state.ship[id] += 1;
-    addLog(def.name + ' upgraded to level ' + state.ship[id] + '.');
-    renderAll();
-  }
-
-  function buyHaki(id) {
-    var def = getHakiDef(id);
-    var lvl = state.haki[id];
-    var cost = hakiCost(def, lvl);
-    if (state.hakiFragments < cost) { addLog('Not enough Haki Fragments for ' + def.name + '.'); return; }
-    state.hakiFragments -= cost;
-    state.haki[id] += 1;
-    addLog(def.name + ' trained to level ' + state.haki[id] + '.');
-    renderAll();
-  }
-
-  function buyFruit(id) {
-    var def = getFruitDef(id);
-    if (!state.fruits[id]) { addLog('That fruit has not been discovered yet.'); return; }
-    if (id === state.equippedFruit) { addLog(def.name + ' is already equipped.'); return; }
-    if (state.shards < def.cost) { addLog('Not enough Poneglyph Shards to attune ' + def.name + '.'); return; }
-    state.shards -= def.cost;
-    state.equippedFruit = id;
-    addLog('Equipped ' + def.name + '.');
-    renderAll();
-  }
-
-  function prestigeGain() {
-    return Math.floor(Math.sqrt(state.bounty / 5000));
-  }
-
-  function doPrestige() {
-    var gain = prestigeGain();
-    if (gain < 1) {
-      addLog('Your bounty is still too low to make a meaningful New World reset.');
-      return;
-    }
-    if (!confirm('Reset your voyage for +' + gain + ' Poneglyph Shards?')) return;
-    var prevShards = state.shards + gain;
-    var compact = state.compact;
-    state = defaultState();
-    state.shards = prevShards;
-    state.totalPrestiges += 1;
-    state.compact = compact;
-    spawnEnemy(false, true);
-    addLog('You returned stronger from the New World with +' + gain + ' Poneglyph Shards.');
-    saveSilently();
-    renderAll();
-  }
-
-  function applyOfflineProgress() {
-    var elapsed = Math.max(0, Math.floor((now() - (state.lastOpened || now())) / 1000));
-    if (elapsed < 10) return;
-    var stats = crewStats();
-    var capped = Math.min(elapsed, 60 * 60 * 4);
-    var dps = stats.dps * stats.speedMul * stats.offlineMul;
-    var island = islands[state.islandIndex];
-    var avgEnemyHp = Math.max(20, (25 + state.islandIndex * 14) * Math.pow(1.33, state.islandIndex) * island.enemyScale * 1.4);
-    var kills = Math.floor((dps * capped) / avgEnemyHp);
-    if (kills < 1) return;
-    var avgBeli = (8 + state.islandIndex * 5) * Math.pow(1.33, state.islandIndex) * island.enemyScale * 1.5;
-    var avgBounty = (1 + state.islandIndex) * Math.pow(1.33, state.islandIndex) * island.enemyScale * 0.7;
-    var avgTreasure = (state.islandIndex + 1) * 0.32;
-    var avgHaki = Math.max(0.08, 0.12 + state.islandIndex * 0.01) * (state.islandIndex + 1) * 0.45;
-    var beliGain = Math.floor(kills * avgBeli * stats.rewardMul);
-    var bountyGain = Math.floor(kills * avgBounty * stats.bountyMul);
-    var treasureGain = Math.floor(kills * avgTreasure * stats.rewardMul * stats.treasureMul * stats.treasureBonus);
-    var hakiGain = Math.floor(kills * avgHaki * stats.rewardMul * stats.hakiMul * stats.hakiBonus);
-    state.beli += beliGain;
-    state.bounty += bountyGain;
-    state.treasure += treasureGain;
-    state.hakiFragments += hakiGain;
-    state.totalBeliEarned += beliGain;
-    maybeUnlockFruit();
-    addLog('While away for ' + elapsed + 's, your crew earned +' + format(beliGain) + ' Beli and defeated about ' + format(kills) + ' foes.');
-  }
-
-  function update(dt) {
-    var stats = crewStats();
-    state.seaPower = totalSeaPower();
-    var baseInterval = 0.9;
-    var attackInterval = Math.max(0.2, baseInterval / Math.max(0.1, stats.speedMul));
-    state.autoAttackCharge += dt;
-    var safety = 0;
-    while (state.autoAttackCharge >= attackInterval && safety < 8) {
-      var auto = stats.dps * attackInterval * stats.speedMul;
-      if (auto > 0) damageEnemy(auto, 'auto');
-      state.autoAttackCharge -= attackInterval;
-      safety++;
-    }
-    if (state.autoAttackCharge > attackInterval * 3) state.autoAttackCharge = attackInterval * 3;
-    maybeUnlockFruit();
-    if (now() - state.lastSave > 15000) saveSilently();
-  }
-
-  function showPopup(text, color) {
-    var layer = document.getElementById('popupLayer');
-    var el = document.createElement('div');
-    el.className = 'popup';
-    el.textContent = text;
-    el.style.left = (35 + Math.random() * 35) + '%';
-    el.style.top = (40 + Math.random() * 24) + '%';
-    if (color) el.style.color = color;
-    layer.appendChild(el);
-    setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 1000);
-  }
-
-  function burstParticles() {
-    var layer = document.getElementById('popupLayer');
-    for (var i=0;i<6;i++) {
-      var p = document.createElement('div');
-      p.className = 'particle';
-      p.style.left = (48 + Math.random() * 8) + '%';
-      p.style.top = (52 + Math.random() * 10) + '%';
-      p.style.setProperty('--dx', ((Math.random()-0.5) * 90) + 'px');
-      p.style.setProperty('--dy', ((Math.random()-0.5) * 70 - 35) + 'px');
-      layer.appendChild(p);
-      setTimeout((function(node){ return function(){ if (node.parentNode) node.parentNode.removeChild(node); }; })(p), 820);
-    }
-  }
-
-  function setTab(tab) {
-    state.currentTab = tab;
-    var tabs = document.querySelectorAll('.tabBtn');
-    for (var i=0;i<tabs.length;i++) tabs[i].classList.toggle('active', tabs[i].dataset.tab === tab);
-    var contents = document.querySelectorAll('.tabContent');
-    for (i=0;i<contents.length;i++) contents[i].classList.add('hide');
-    document.getElementById('tab-' + tab).classList.remove('hide');
-  }
-
-  function renderResources() {
-    var stats = crewStats();
-    document.getElementById('beliVal').textContent = format(state.beli);
-    document.getElementById('bountyVal').textContent = format(state.bounty);
-    document.getElementById('treasureVal').textContent = format(state.treasure);
-    document.getElementById('hakiVal').textContent = format(state.hakiFragments);
-    document.getElementById('shardVal').textContent = format(state.shards);
-    document.getElementById('powerVal').textContent = format(state.seaPower);
-    document.getElementById('beliRate').textContent = '+' + format(stats.dps * stats.rewardMul * 0.7) + '/s est.';
-    document.getElementById('voyageSummary').textContent = islands[state.islandIndex].name + ' · ' + islands[state.islandIndex].sea + ' · ' + (state.fightingBoss ? 'Boss active' : 'Island skirmishes');
-    document.getElementById('routeText').textContent = 'Highest cleared route: ' + islands[Math.min(state.highestIsland, islands.length-1)].name + '. Current island: ' + islands[state.islandIndex].name + '.';
-    document.getElementById('automationText').textContent = 'Auto damage: ' + format(stats.dps * stats.speedMul) + '/s in steady volleys · Click damage: ' + format(stats.click) + ' · Crit chance: ' + Math.round(stats.critChance * 100) + '%';
-    document.getElementById('multiplierText').textContent = 'Reward x' + stats.rewardMul.toFixed(2) + ' · Damage x' + (stats.allDamageMul * aggregateBonuses().dpsMul).toFixed(2) + ' · Treasure x' + (stats.treasureMul * stats.treasureBonus).toFixed(2) + ' · Haki x' + (stats.hakiMul * stats.hakiBonus).toFixed(2);
-    document.getElementById('prestigeHint').textContent = 'Current prestige gain: +' + prestigeGain() + ' Poneglyph Shards on reset. Recommended once you feel progression slowing after several islands.';
-    document.getElementById('equippedFruitText').textContent = currentFruit().icon + ' ' + currentFruit().name + ' · ' + currentFruit().desc;
-    document.getElementById('compactBtn').textContent = 'Compact: ' + (state.compact ? 'On' : 'Off');
-    document.getElementById('app').classList.toggle('compact', !!state.compact);
-  }
-
-  function renderBattle() {
-    var e = state.enemy;
-    if (!e) return;
-    var island = islands[state.islandIndex];
-    document.getElementById('islandBadge').textContent = island.icon + ' ' + island.name + ' · ' + island.sea;
-    document.getElementById('enemyTypeText').textContent = e.isBoss ? 'Boss encounter' : 'Island encounter';
-    document.getElementById('enemyName').textContent = e.name;
-    document.getElementById('enemyMeta').textContent = 'Lv ' + e.level + (e.isBoss ? ' Boss' : ' Foe');
-    document.getElementById('enemyPortrait').textContent = e.icon;
-    document.getElementById('enemySprite').textContent = e.icon;
-    document.getElementById('enemyFlavor').textContent = island.flavor + ' ' + e.flavor;
-    var hpPct = Math.max(0, Math.min(100, (state.enemyHp / state.enemyMaxHp) * 100));
-    document.getElementById('enemyHpFill').style.width = hpPct + '%';
-    document.getElementById('enemyHpText').textContent = 'HP ' + format(state.enemyHp) + ' / ' + format(state.enemyMaxHp);
-    var cd = Math.max(0, state.skillCooldownUntil - now());
-    document.getElementById('skillBtn').textContent = cd > 0 ? 'Crew Skill (' + (cd/1000).toFixed(1) + 's)' : 'Crew Skill';
-  }
-
-  function renderCrewRecruit() {
-    var wrap = document.getElementById('crewRecruitList');
-    wrap.innerHTML = '';
-    for (var i=0;i<crewDefs.length;i++) {
-      var def = crewDefs[i], entry = state.crew[def.id];
-      var row = document.createElement('div');
-      row.className = 'card crewRow';
-      var actionLabel = entry.owned ? 'Train' : 'Recruit';
-      var cost = entry.owned ? crewLevelCost(def, entry.level) : def.cost;
-      row.innerHTML = '<div class="portrait">' + def.icon + '</div>' +
-        '<div><div class="title">' + def.name + '</div><div class="small muted">' + def.desc + '</div><div class="tiny" style="margin-top:6px;">' +
-        (entry.owned ? ('Level ' + entry.level + ' · Next cost: ' + format(cost) + ' Beli') : ('Recruit cost: ' + format(cost) + ' Beli')) + '</div></div>' +
-        '<div><button class="btn green" data-crewbuy="' + def.id + '">' + actionLabel + '</button></div>';
-      wrap.appendChild(row);
-    }
-  }
-
-  function renderOwnedCrew() {
-    var wrap = document.getElementById('ownedCrewList');
-    wrap.innerHTML = '';
-    var any = false;
-    var stats = crewStats();
-    for (var i=0;i<crewDefs.length;i++) {
-      var def = crewDefs[i], entry = state.crew[def.id];
-      if (!entry.owned) continue;
-      any = true;
-      var lvl = entry.level;
-      var row = document.createElement('div');
-      row.className = 'card crewRow';
-      var baseDps = def.baseDps * lvl * Math.pow(1.16, lvl - 1) * aggregateBonuses().crewMul;
-      var click = def.baseClick * lvl * Math.pow(1.12, lvl - 1) * aggregateBonuses().crewMul;
-      row.innerHTML = '<div class="portrait">' + def.icon + '</div>' +
-        '<div><div class="title">' + def.name + ' · Lv ' + lvl + '</div><div class="small muted">Idle ' + format(baseDps) + '/s · Click ' + format(click) + '</div></div>' +
-        '<div class="small">Ready</div>';
-      wrap.appendChild(row);
-    }
-    if (!any) {
-      wrap.innerHTML = '<div class="card"><div class="small muted">No crewmates yet. Recruit Luffy first, then grow your Straw Hat-style crew.</div></div>';
-    }
-  }
-
-  function renderShip() {
-    var wrap = document.getElementById('shipList');
-    wrap.innerHTML = '';
-    for (var i=0;i<shipDefs.length;i++) {
-      var def = shipDefs[i], lvl = state.ship[def.id], cost = shipCost(def, lvl);
-      var row = document.createElement('div');
-      row.className = 'card shopRow';
-      row.innerHTML = '<div class="portrait">⚓</div>' +
-        '<div><div class="title">' + def.name + ' · Lv ' + lvl + '</div><div class="small muted">' + def.desc + '</div><div class="tiny" style="margin-top:6px;">Cost: ' + format(cost) + ' Treasure</div></div>' +
-        '<div><button class="btn" data-shipbuy="' + def.id + '">Upgrade</button></div>';
-      wrap.appendChild(row);
-    }
-  }
-
-  function renderHaki() {
-    var wrap = document.getElementById('hakiList');
-    wrap.innerHTML = '';
-    for (var i=0;i<hakiDefs.length;i++) {
-      var def = hakiDefs[i], lvl = state.haki[def.id], cost = hakiCost(def, lvl);
-      var row = document.createElement('div');
-      row.className = 'card shopRow';
-      row.innerHTML = '<div class="portrait">✨</div>' +
-        '<div><div class="title">' + def.name + ' · Lv ' + lvl + '</div><div class="small muted">' + def.desc + '</div><div class="tiny" style="margin-top:6px;">Cost: ' + format(cost) + ' Haki Fragments</div></div>' +
-        '<div><button class="btn" data-hakibuy="' + def.id + '">Train</button></div>';
-      wrap.appendChild(row);
-    }
-  }
-
-  function renderFruits() {
-    var wrap = document.getElementById('fruitList');
-    wrap.innerHTML = '';
-    for (var i=0;i<fruitDefs.length;i++) {
-      var def = fruitDefs[i];
-      var discovered = !!state.fruits[def.id];
-      var equipped = state.equippedFruit === def.id;
-      var row = document.createElement('div');
-      row.className = 'card fruitRow';
-      var desc = discovered ? def.desc : ('Unlock at ' + format(def.unlockBounty) + ' Bounty.');
-      var actionHtml = discovered ?
-        '<button class="btn ' + (equipped ? 'ghost' : 'green') + '" data-fruitbuy="' + def.id + '">' + (equipped ? 'Equipped' : ('Equip (' + format(def.cost) + ' Shards)')) + '</button>' :
-        '<button class="btn ghost" disabled>Locked</button>';
-      row.innerHTML = '<div class="portrait">' + def.icon + '</div>' +
-        '<div><div class="title">' + def.name + '</div><div class="small muted">' + desc + '</div></div>' +
-        '<div>' + actionHtml + '</div>';
-      wrap.appendChild(row);
-    }
-  }
-
-  function renderLog() {
-    var log = document.getElementById('battleLog');
-    log.innerHTML = '';
-    for (var i=0;i<state.log.length;i++) {
-      var e = document.createElement('div');
-      e.className = 'logEntry';
-      e.textContent = '[' + state.log[i].t + '] ' + state.log[i].text;
-      log.appendChild(e);
-    }
-  }
-
-  function renderAll() {
-    renderResources();
-    renderBattle();
-    renderCrewRecruit();
-    renderOwnedCrew();
-    renderShip();
-    renderHaki();
-    renderFruits();
-    renderLog();
-    setTab(state.currentTab);
-  }
-
-  function hookEvents() {
-    document.querySelector('.tabs').addEventListener('click', function(ev) {
-      var btn = ev.target.closest('.tabBtn');
-      if (!btn) return;
-      setTab(btn.dataset.tab);
-    });
-
-    document.body.addEventListener('click', function(ev) {
-      var target = ev.target;
-      if (target.matches('[data-crewbuy]')) buyCrew(target.getAttribute('data-crewbuy'));
-      if (target.matches('[data-shipbuy]')) buyShip(target.getAttribute('data-shipbuy'));
-      if (target.matches('[data-hakibuy]')) buyHaki(target.getAttribute('data-hakibuy'));
-      if (target.matches('[data-fruitbuy]')) buyFruit(target.getAttribute('data-fruitbuy'));
-    });
-
-    document.getElementById('attackBtn').addEventListener('click', attackClick);
-    document.getElementById('skillBtn').addEventListener('click', useSkill);
-    document.getElementById('bossBtn').addEventListener('click', challengeBoss);
-    document.getElementById('backBtn').addEventListener('click', prevIsland);
-    document.getElementById('nextIslandBtn').addEventListener('click', nextIsland);
-    document.getElementById('compactBtn').addEventListener('click', function(){ state.compact = !state.compact; renderResources(); });
-    document.getElementById('saveBtn').addEventListener('click', save);
-    document.getElementById('resetBtn').addEventListener('click', hardReset);
-    document.getElementById('prestigeBtn').addEventListener('click', doPrestige);
-
-    document.getElementById('exportBtn').addEventListener('click', function(){
-      var text = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
-      prompt('Copy your save code:', text);
-    });
-
-    document.getElementById('importBtn').addEventListener('click', function(){
-      var code = prompt('Paste your save code:');
-      if (!code) return;
-      try {
-        var parsed = JSON.parse(decodeURIComponent(escape(atob(code))));
-        state = parsed;
-        ensureState(state);
-        saveSilently();
-        renderAll();
-        addLog('Save imported.');
-      } catch (e) {
-        alert('Invalid save code.');
-      }
-    });
-  }
-
-  function loop() {
-    var t = now();
-    var dt = Math.min(0.25, (t - state.lastTick) / 1000);
-    state.lastTick = t;
-    update(dt);
-    renderResources();
-    renderBattle();
     requestAnimationFrame(loop);
+    // Save every 10 seconds
+    setInterval(() => this.saveState(), 10000);
   }
 
-  // initialize
-  hookEvents();
-  applyOfflineProgress();
-  if (!state.enemy) spawnEnemy(false, true);
-  renderAll();
-  addLog('Welcome aboard, Captain. Recruit your first crewmate and begin your rise.');
-  requestAnimationFrame(loop);
+  update(dt) {
+    // Idle Beli income
+    this.idleTimer += dt;
+    if (this.idleTimer >= 1) {
+      const bps = this.getIdleBPS();
+      const ticks = Math.floor(this.idleTimer);
+      this.state.beli += bps * ticks;
+      this.idleTimer -= ticks;
+    }
 
-  window.addEventListener('beforeunload', saveSilently);
-  window.__grandLineIdleDebug = { state: state, spawnEnemy: spawnEnemy, buyCrew: buyCrew };
-})();
+    // Stamina regen
+    const regenRate = this.getStaminaRegen();
+    this.state.stamina = Math.min(this.state.maxStamina, this.state.stamina + regenRate * dt);
+
+    // Haki cooldowns
+    for (const k of Object.keys(this.hakiCooldown)) {
+      this.hakiCooldown[k] = Math.max(0, this.hakiCooldown[k] - dt);
+    }
+
+    // Combat
+    this.combatUpdate(dt);
+
+    // Auto Level crew
+    const autoLvl = this.getUpgradeCount('autoLevel', this.state.crewUpgrades);
+    if (autoLvl > 0) {
+      this.autoLevelTimer += dt;
+      if (this.autoLevelTimer >= 10 / autoLvl) {
+        this.autoLevelTimer = 0;
+        this.autoLevelCrew();
+      }
+    }
+
+    // Compute bounty
+    this.state.bounty = this.state.combat.kills > 0
+      ? Math.floor(this.state.combat.kills * 1000 + this.state.beli * 0.01)
+      : 0;
+  }
+
+  getStaminaRegen() {
+    const base = 1;
+    const aquarium = this.getUpgradeCount('aquarium', this.state.ship.upgrades) * 0.05;
+    const ht2 = this.getUpgradeCount('ht2', this.state.haki.training || {}) * 0.05;
+    return base * (1 + aquarium + ht2);
+  }
+
+  // ===== COMBAT SYSTEM =====
+  initEnemy(enemyId) {
+    const eId = enemyId || this.getDefaultEnemy();
+    this.currentEnemy = ENEMIES.find(e => e.id === eId) || ENEMIES[0];
+    const scalingLvl = Math.max(1, this.state.islands.current);
+    const scale = 1 + scalingLvl * 0.05;
+    this.enemyMaxHP = Math.floor(this.currentEnemy.hp * scale);
+    this.enemyHP    = this.enemyMaxHP;
+    this.isBattling = true;
+    this.playerHP   = this.playerMaxHP = this.getMaxPlayerHP();
+  }
+
+  getDefaultEnemy() {
+    const islandIdx = this.state.islands.current;
+    const island = ISLANDS[islandIdx] || ISLANDS[0];
+    return island.enemyIds[0];
+  }
+
+  combatUpdate(dt) {
+    if (!this.isBattling || !this.currentEnemy) return;
+    this.combatTimer += dt * this.getBattleSpeed();
+
+    // Attack interval: 1 second base
+    if (this.combatTimer >= 1) {
+      this.combatTimer -= 1;
+
+      // Player attacks
+      const dmg = this.getPlayerATK();
+      this.enemyHP = Math.max(0, this.enemyHP - dmg);
+      this.showDamagePopup(dmg, false);
+      this.log(`⚔️ You dealt <span class="bold text-gold">${fmt(dmg)}</span> dmg to ${this.currentEnemy.name}`, 'dmg-enemy');
+
+      // Enemy attacks player
+      const eDmg = Math.max(1, this.currentEnemy.atk - Math.floor(this.getCrewStat('def') * 0.5));
+      // Observation evasion
+      const obsLvl = this.state.haki.observation.level;
+      const evasion = obsLvl * 0.04;
+      if (!chance(evasion)) {
+        this.playerHP = Math.max(0, this.playerHP - eDmg);
+        this.log(`💥 ${this.currentEnemy.name} dealt <span class="bold text-red">${fmt(eDmg)}</span> dmg to you`, 'dmg-player');
+        this.showDamagePopup(eDmg, true);
+      } else {
+        this.log(`💨 You evaded ${this.currentEnemy.name}'s attack!`, 'special');
+      }
+
+      // Check enemy dead
+      if (this.enemyHP <= 0) {
+        this.onEnemyKilled();
+        return;
+      }
+
+      // Check player dead
+      if (this.playerHP <= 0) {
+        // Brook revive
+        const brook = this.state.crew['brook'];
+        if (brook?.unlocked && !this._brookRevived) {
+          this.playerHP = Math.floor(this.playerMaxHP * 0.3);
+          this._brookRevived = true;
+          this.log(`🎻 Brook revived you with 30% HP! "Yohohoho!"`, 'special');
+        } else {
+          this.onPlayerDied();
+        }
+      }
+    }
+  }
+
+  onEnemyKilled() {
+    const e = this.currentEnemy;
+    const beliGain = randInt(e.beli[0], e.beli[1]);
+    const xpGain   = e.xp;
+    const bountyGain = e.bounty;
+
+    // Apply modifiers
+    const beliMult = (1 + this.getUpgradeCount('treasure', this.state.crewUpgrades) * 0.15)
+                   * Math.pow(1.5, this.state.prestige.upgrades.belimult || 0);
+    const xpMult   = (1 + this.getUpgradeCount('navmap', this.state.crewUpgrades) * 0.2)
+                   * (1 + this.getUpgradeCount('library', this.state.ship.upgrades) * 0.1);
+
+    this.state.beli   += Math.floor(beliGain * beliMult);
+    this.state.bounty += bountyGain;
+    this.state.combat.wins++;
+    this.state.combat.kills++;
+
+    // Crew XP
+    this.awardCrewXP(Math.floor(xpGain * xpMult));
+
+    // Haki XP
+    const hakiXPMult = 1 + this.getUpgradeCount('ht1', this.state.haki.training || {}) * 0.1;
+    this.awardHakiXP(Math.floor(2 * hakiXPMult));
+
+    // Sanji HP regen on kill
+    if (this.state.crew['sanji']?.unlocked) {
+      this.playerHP = Math.min(this.playerMaxHP, this.playerHP + Math.floor(this.playerMaxHP * 0.02));
+    }
+
+    this.log(`✅ Defeated ${e.name}! Earned ${fmtBeli(Math.floor(beliGain * beliMult))} & ${xpGain} XP`, 'special');
+    this._brookRevived = false;
+
+    // Check island clear
+    this.checkIslandProgress();
+
+    // Respawn enemy
+    setTimeout(() => {
+      this.initEnemy(this.selectedEnemyId || this.getDefaultEnemy());
+    }, 600);
+  }
+
+  onPlayerDied() {
+    this.log(`💀 You were defeated! Recovering...`, 'system');
+    this.playerHP = Math.floor(this.playerMaxHP * 0.5);
+    this.state.beli = Math.max(0, this.state.beli - Math.floor(this.state.beli * 0.05));
+    this.initEnemy(this.selectedEnemyId || this.getDefaultEnemy());
+    this._brookRevived = false;
+  }
+
+  checkIslandProgress() {
+    const island = ISLANDS[this.state.islands.current];
+    if (!island) return;
+    if (this.state.combat.wins % 20 === 0) {
+      const cleared = this.state.islands.cleared;
+      if (!cleared.includes(island.id)) {
+        cleared.push(island.id);
+        this.state.treasure += island.rewardTreasure;
+        this.state.beli += island.rewardBeli;
+        this.toast(`🏝️ Island Cleared: ${island.name}! +${island.rewardTreasure} Treasure!`);
+        this.log(`🏆 Cleared ${island.name}! Earned ${fmtBeli(island.rewardBeli)} + ${island.rewardTreasure} Treasure!`, 'special');
+      }
+    }
+  }
+
+  // ===== CREW SYSTEM =====
+  recruitCrew(id) {
+    const cd = CREW_DATA.find(c => c.id === id);
+    if (!cd) return;
+    const cs = this.state.crew[id] || { level:1, unlocked:false };
+    if (cs.unlocked) return;
+    if (this.state.beli < cd.unlockCost) {
+      this.toast('❌ Not enough Beli!'); return;
+    }
+    this.state.beli -= cd.unlockCost;
+    cs.unlocked = true; cs.level = 1;
+    this.state.crew[id] = cs;
+    this.toast(`🎉 ${cd.name} joined your crew!`);
+    this.log(`🏴‍☠️ ${cd.name} has joined the Straw Hats!`, 'special');
+    this.playerHP = this.playerMaxHP = this.getMaxPlayerHP();
+    this.renderCrew();
+  }
+
+  levelUpCrew(id) {
+    const cd = CREW_DATA.find(c => c.id === id);
+    if (!cd) return;
+    const cs = this.state.crew[id];
+    if (!cs?.unlocked) return;
+    const cost = Math.floor(100 * Math.pow(1.15, cs.level));
+    if (this.state.beli < cost) { this.toast('❌ Not enough Beli!'); return; }
+    this.state.beli -= cost;
+    cs.level++;
+    this.toast(`⬆️ ${cd.name} leveled up to ${cs.level}!`);
+    this.playerHP = this.playerMaxHP = this.getMaxPlayerHP();
+    this.renderCrew();
+  }
+
+  autoLevelCrew() {
+    for (const cd of CREW_DATA) {
+      const cs = this.state.crew[cd.id];
+      if (!cs?.unlocked) continue;
+      const cost = Math.floor(100 * Math.pow(1.15, cs.level));
+      if (this.state.beli >= cost) {
+        this.state.beli -= cost;
+        cs.level++;
+      }
+    }
+  }
+
+  awardCrewXP(xp) {
+    // XP distributed equally
+  }
+
+  // ===== HAKI SYSTEM =====
+  useHaki(type) {
+    if (this.hakiCooldown[type] > 0) {
+      this.toast(`⏳ ${type} Haki on cooldown!`); return;
+    }
+    const cost = 20;
+    if (this.state.stamina < cost) { this.toast('❌ Not enough stamina!'); return; }
+    this.state.stamina -= cost;
+    this.hakiCooldown[type] = 30;
+
+    if (type === 'conqueror') {
+      const dmg = this.getCrewStat('atk') * 5;
+      this.enemyHP = Math.max(0, this.enemyHP - dmg);
+      this.log(`👑 Conqueror's Haki ERUPTS! Dealt ${fmt(dmg)} dmg!`, 'special');
+      if (this.enemyHP <= 0) this.onEnemyKilled();
+    } else if (type === 'armament') {
+      const dmg = this.getCrewStat('atk') * 3;
+      this.enemyHP = Math.max(0, this.enemyHP - dmg);
+      this.log(`⚫ Armament Haki coats your fist! Dealt ${fmt(dmg)} dmg!`, 'special');
+      if (this.enemyHP <= 0) this.onEnemyKilled();
+    } else if (type === 'observation') {
+      this.log(`👁️ Observation Haki active! Next 5 attacks evaded!`, 'special');
+    }
+    this.awardHakiXP(15, type);
+  }
+
+  awardHakiXP(xp, specificType) {
+    const types = specificType ? [specificType] : ['conqueror','armament','observation'];
+    const drill = 1 + this.getUpgradeCount('ht3', this.state.haki.training || {}) * 0.15;
+    for (const t of types) {
+      const h = this.state.haki[t];
+      h.xp += Math.floor(xp * drill);
+      const needed = this.hakiXPNeeded(h.level);
+      if (h.xp >= needed) {
+        h.xp -= needed;
+        h.level++;
+        this.toast(`🔮 ${t} Haki reached Level ${h.level}!`);
+      }
+    }
+  }
+
+  hakiXPNeeded(level) {
+    return Math.floor(100 * Math.pow(1.4, level));
+  }
+
+  buyHakiUpgrade(type, id) {
+    const u = HAKI_UPGRADES[type]?.find(u => u.id === id);
+    if (!u) return;
+    const key = `haki_${id}`;
+    if (this.state[key]) { this.toast('Already purchased!'); return; }
+    if (this.state.beli < u.cost) { this.toast('❌ Not enough Beli!'); return; }
+    this.state.beli -= u.cost;
+    this.state[key] = true;
+    this.toast(`✅ ${u.name} purchased!`);
+  }
+
+  // ===== SHIP SYSTEM =====
+  upgradeShipTier() {
+    const next = this.state.ship.tier + 1;
+    if (next >= SHIP_TIERS.length) { this.toast('Max ship tier!'); return; }
+    const ship = SHIP_TIERS[next];
+    if (this.state.beli < ship.cost) { this.toast('❌ Not enough Beli!'); return; }
+    this.state.beli -= ship.cost;
+    this.state.ship.tier = next;
+    this.toast(`⛵ Ship upgraded to ${ship.name}!`);
+    this.log(`🚢 The crew now sails on ${ship.name}!`, 'special');
+  }
+
+  buyShipUpgrade(id) {
+    const u = SHIP_UPGRADES.find(u => u.id === id);
+    if (!u) return;
+    const curr = this.getUpgradeCount(id, this.state.ship.upgrades);
+    if (curr >= u.maxLevel) { this.toast('Max level!'); return; }
+    const cost = Math.floor(u.baseCost * Math.pow(u.costMult, curr));
+    if (this.state.beli < cost) { this.toast('❌ Not enough Beli!'); return; }
+    this.state.beli -= cost;
+    this.state.ship.upgrades[id] = (this.state.ship.upgrades[id] || 0) + 1;
+    this.toast(`✅ ${u.name} upgraded to Lv${curr+1}!`);
+  }
+
+  // ===== CREW UPGRADES =====
+  buyCrewUpgrade(id) {
+    const u = CREW_UPGRADES.find(u => u.id === id);
+    if (!u) return;
+    const curr = this.getUpgradeCount(id, this.state.crewUpgrades);
+    if (curr >= u.maxLevel) { this.toast('Max level!'); return; }
+    const cost = Math.floor(u.baseCost * Math.pow(u.costMult, curr));
+    if (this.state.beli < cost) { this.toast('❌ Not enough Beli!'); return; }
+    this.state.beli -= cost;
+    this.state.crewUpgrades[id] = (this.state.crewUpgrades[id] || 0) + 1;
+    this.toast(`✅ ${u.name} Lv${curr+1}!`);
+  }
+
+  // ===== DEVIL FRUIT =====
+  eatDevilFruit(id) {
+    const df = DEVIL_FRUITS.find(d => d.id === id);
+    if (!df) return;
+    if (!this.state.devilFruit.owned.includes(id)) {
+      if (this.state.beli < df.cost) { this.toast('❌ Not enough Beli!'); return; }
+      this.state.beli -= df.cost;
+      this.state.devilFruit.owned.push(id);
+      this.toast(`🍎 Acquired ${df.name}!`);
+    }
+    if (this.state.devilFruit.equipped === id) {
+      this.state.devilFruit.equipped = null;
+      this.toast('🍎 Devil Fruit unequipped.');
+    } else {
+      this.state.devilFruit.equipped = id;
+      this.toast(`🍎 You ate the ${df.name}! You can no longer swim!`);
+      this.log(`🍎 You consumed the ${df.name}! Power surges through you!`, 'special');
+    }
+    this.playerMaxHP = this.getMaxPlayerHP();
+    this.renderDevilFruits();
+  }
+
+  // ===== ISLAND SYSTEM =====
+  setActiveIsland(idx) {
+    const island = ISLANDS[idx];
+    if (!island) return;
+    if (this.state.bounty < island.unlockBounty && idx > 0) {
+      this.toast(`❌ Need ฿${fmt(island.unlockBounty)} bounty to unlock!`); return;
+    }
+    this.state.islands.current = idx;
+    this.selectedEnemyId = island.enemyIds[0];
+    this.initEnemy(this.selectedEnemyId);
+    this.toast(`🏝️ Sailing to ${island.name}!`);
+    this.renderIslands();
+  }
+
+  setEnemy(id) {
+    this.selectedEnemyId = id;
+    this.initEnemy(id);
+    this.renderCombat();
+  }
+
+  setBattleSpeed(s) {
+    const maxSpeed = 1 + this.getUpgradeCount('sail', this.state.ship.upgrades);
+    if (s > maxSpeed * 2 && s > 2) {
+      this.toast(`❌ Upgrade Ship Sails to unlock ${s}x speed!`); return;
+    }
+    this.state.battleSpeed = s;
+    this.toast(`⚡ Battle speed: ${s}x`);
+  }
+
+  // ===== SPECIAL ATTACKS =====
+  useSpecialAttack(crewId) {
+    const cd = CREW_DATA.find(c => c.id === crewId);
+    if (!cd) return;
+    const cs = this.state.crew[crewId];
+    if (!cs?.unlocked) return;
+    const cost = 15;
+    if (this.state.stamina < cost) { this.toast('Not enough stamina!'); return; }
+    this.state.stamina -= cost;
+    const dmg = this.getCrewStat('atk') * (2 + cs.level * 0.1);
+    this.enemyHP = Math.max(0, this.enemyHP - dmg);
+    this.log(`✨ ${cd.name} used ${cd.ability}! Dealt ${fmt(dmg)} dmg!`, 'special');
+    if (this.enemyHP <= 0) this.onEnemyKilled();
+  }
+
+  // ===== PRESTIGE =====
+  canPrestige() {
+    return this.state.beli >= 1000000000 || this.state.islands.cleared.includes('raftel');
+  }
+
+  getPrestigeCoins() {
+    return Math.floor(1 + this.state.prestige.count * 0.5 + Math.log10(Math.max(10, this.state.beli)) - 6);
+  }
+
+  prestige() {
+    if (!this.canPrestige()) { this.toast('❌ Not ready to prestige yet!'); return; }
+    const coins = Math.max(1, this.getPrestigeCoins());
+    this.state.prestige.dCoins += coins;
+    this.state.prestige.count++;
+    this.prestigeHistory.push({
+      run: this.state.prestige.count,
+      beli: this.state.beli,
+      coins,
+      time: Math.floor(this.state.totalTime),
+    });
+    this.state.prestige.history = this.prestigeHistory;
+
+    // Save permanent upgrades before reset
+    const perm = { ...this.state.prestige };
+
+    // Reset state
+    const newState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    newState.prestige = perm;
+
+    // Apply start bonuses from D. Coin upgrades
+    const startBeli = Math.pow(10, (perm.upgrades.startbeli || 0));
+    newState.beli = startBeli;
+    const hakiStart = (perm.upgrades.hakistart || 0) * 5;
+    newState.haki.conqueror.level   = hakiStart;
+    newState.haki.armament.level    = hakiStart;
+    newState.haki.observation.level = hakiStart;
+
+    this.state = newState;
+    this.playerHP = this.playerMaxHP = this.getMaxPlayerHP();
+    this.initEnemy();
+    this.toast(`👑 Prestige! Earned ${coins} D. Coins. Your legend grows!`);
+    this.log(`🌊 You set sail again, stronger than before! Prestige #${perm.count}`, 'special');
+    this.render();
+  }
+
+  buyDCoinUpgrade(id) {
+    const u = DCOIN_UPGRADES.find(u => u.id === id);
+    if (!u) return;
+    const curr = this.state.prestige.upgrades[id] || 0;
+    if (curr >= u.maxRank) { this.toast('Max rank!'); return; }
+    if (this.state.prestige.dCoins < u.cost) { this.toast('❌ Not enough D. Coins!'); return; }
+    this.state.prestige.dCoins -= u.cost;
+    this.state.prestige.upgrades[id] = curr + 1;
+    this.toast(`👑 ${u.name} upgraded to Rank ${curr+1}!`);
+    this.renderPrestige();
+  }
+
+  // ===== HAKI TRAINING UPGRADES =====
+  buyHakiTraining(id) {
+    const u = HAKI_TRAINING_UPGRADES.find(u => u.id === id);
+    if (!u) return;
+    if (!this.state.haki.training) this.state.haki.training = {};
+    const curr = this.getUpgradeCount(id, this.state.haki.training);
+    if (curr >= u.maxLevel) { this.toast('Max level!'); return; }
+    const cost = Math.floor(u.baseCost * Math.pow(u.costMult, curr));
+    if (this.state.beli < cost) { this.toast('❌ Not enough Beli!'); return; }
+    this.state.beli -= cost;
+    this.state.haki.training[id] = curr + 1;
+    this.toast(`✅ ${u.name} Lv${curr+1}!`);
+  }
+
+  // ===== UI: DAMAGE POPUP =====
+  showDamagePopup(dmg, isPlayer) {
+    const arena = $('combatArena');
+    if (!arena) return;
+    const popup = document.createElement('div');
+    popup.className = 'dmg-popup';
+    popup.style.color = isPlayer ? '#ff5252' : '#ffd740';
+    popup.style.left = isPlayer ? '25%' : '65%';
+    popup.style.top = '60px';
+    popup.textContent = (isPlayer ? '-' : '-') + fmt(dmg);
+    arena.style.position = 'relative';
+    arena.appendChild(popup);
+    setTimeout(() => popup.remove(), 1200);
+  }
+
+  // ===== UI: TOAST =====
+  toast(msg) {
+    const c = $('toastContainer');
+    if (!c) return;
+    const t = document.createElement('div');
+    t.className = 'toast'; t.innerHTML = msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3100);
+  }
+
+  // ===== UI: LOG =====
+  log(msg, cls='') {
+    const c = $('combatLog');
+    if (!c) return;
+    this.logEntries.push({ msg, cls });
+    if (this.logEntries.length > 100) this.logEntries.shift();
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${cls}`; entry.innerHTML = msg;
+    c.appendChild(entry);
+    while (c.children.length > 60) c.removeChild(c.firstChild);
+    c.scrollTop = c.scrollHeight;
+  }
+
+  // ===== RENDER =====
+  render() {
+    this.renderResources();
+    this.renderCombatBars();
+    this.renderHaki();
+    this.renderPrestige();
+  }
+
+  renderResources() {
+    const bar = $('resourcesBar');
+    if (!bar) return;
+    const bps = this.getIdleBPS();
+    bar.innerHTML = `
+      <div class="res"><span class="res-icon">💰</span>
+        <div><div class="res-val">${fmtBeli(this.state.beli)}</div>
+        <div class="res-rate">+${fmt(bps)}/s</div></div>
+      </div>
+      <div class="res"><span class="res-icon">💎</span>
+        <div><div class="res-val">${fmt(this.state.treasure)}</div>
+        <div class="res-rate">Treasure</div></div>
+      </div>
+      <div class="res"><span class="res-icon">⚡</span>
+        <div><div class="res-val">${Math.floor(this.state.stamina)}/${this.state.maxStamina}</div>
+        <div class="res-rate">Stamina</div></div>
+      </div>
+      <div class="res"><span class="res-icon">🪙</span>
+        <div><div class="res-val" style="color:#ce93d8">${this.state.prestige.dCoins}</div>
+        <div class="res-rate">D. Coins</div></div>
+      </div>
+    `;
+    const bd = $('bountyDisplay');
+    if (bd) bd.textContent = fmtBeli(this.state.bounty);
+  }
+
+  renderCombatBars() {
+    // Player HP
+    const phpBar = $('playerHPBar');
+    const phpTxt = $('playerHP');
+    const pmhpTxt = $('playerMaxHP');
+    if (phpBar) phpBar.style.width = Math.max(0, (this.playerHP / this.playerMaxHP * 100)) + '%';
+    if (phpTxt) phpTxt.textContent = fmt(Math.max(0, this.playerHP));
+    if (pmhpTxt) pmhpTxt.textContent = fmt(this.playerMaxHP);
+
+    // Enemy HP
+    const ehpBar = $('enemyHPBar');
+    const ehpTxt = $('enemyHP');
+    const emhpTxt = $('enemyMaxHP');
+    if (ehpBar) ehpBar.style.width = Math.max(0, (this.enemyHP / this.enemyMaxHP * 100)) + '%';
+    if (ehpTxt) ehpTxt.textContent = fmt(Math.max(0, this.enemyHP));
+    if (emhpTxt) emhpTxt.textContent = fmt(this.enemyMaxHP);
+
+    // Stamina
+    const stBar = $('staminaBar');
+    const stVal = $('staminaVal');
+    const stReg = $('staminaRegen');
+    if (stBar) stBar.style.width = (this.state.stamina / this.state.maxStamina * 100) + '%';
+    if (stVal) stVal.textContent = `${Math.floor(this.state.stamina)} / ${this.state.maxStamina}`;
+    if (stReg) stReg.textContent = `+${this.getStaminaRegen().toFixed(1)}/s`;
+
+    // Battle speed display
+    const bsd = $('battleSpeedDisplay');
+    if (bsd) bsd.textContent = `Speed: ${this.getBattleSpeed().toFixed(1)}x`;
+
+    // Battle stats
+    const bs = $('battleStats');
+    if (bs) {
+      bs.innerHTML = `
+        <div class="stat">⚔️ ATK<br><strong class="text-gold">${fmt(this.getCrewStat('atk'))}</strong></div>
+        <div class="stat">🛡️ DEF<br><strong class="text-gold">${fmt(this.getCrewStat('def'))}</strong></div>
+        <div class="stat">❤️ Max HP<br><strong class="text-gold">${fmt(this.getMaxPlayerHP())}</strong></div>
+        <div class="stat">💀 Kills<br><strong class="text-gold">${fmt(this.state.combat.kills)}</strong></div>
+        <div class="stat">🏆 Wins<br><strong class="text-gold">${fmt(this.state.combat.wins)}</strong></div>
+        <div class="stat">🎯 Crit%<br><strong class="text-gold">${(this.getCritChance()*100).toFixed(0)}%</strong></div>
+      `;
+    }
+  }
+
+  renderHaki() {
+    const types = ['conqueror','armament','observation'];
+    const ids    = { conqueror:'conq', armament:'arm', observation:'obs' };
+    const labels = { conqueror:'Conqueror\'s', armament:'Armament', observation:'Observation' };
+    for (const t of types) {
+      const h = this.state.haki[t];
+      const bar = $(ids[t]+'Bar');
+      const xpEl = $(ids[t]+'XP');
+      const lvlEl = $(ids[t]+'Lvl');
+      const needed = this.hakiXPNeeded(h.level);
+      if (bar)  bar.style.width  = (h.xp / needed * 100) + '%';
+      if (xpEl) xpEl.textContent = `XP: ${fmt(h.xp)} / ${fmt(needed)}`;
+      if (lvlEl) lvlEl.textContent = `Level ${h.level}`;
+    }
+  }
+
+  renderPrestige() {
+    const btn = $('prestigeBtn');
+    if (btn) {
+      const can = this.canPrestige();
+      btn.disabled = !can;
+      btn.textContent = can ? `🌊 Set Sail Again (Prestige)` : `🌊 Prestige (Need ฿1B or clear Raftel)`;
+    }
+    const pe = $('prestigeEarnable');
+    if (pe) pe.textContent = `${Math.max(1, this.getPrestigeCoins())} 🪙`;
+    const pc = $('prestigeCount');
+    if (pc) pc.textContent = this.state.prestige.count;
+    const dc = $('dCoins');
+    if (dc) dc.textContent = `${this.state.prestige.dCoins} 🪙`;
+
+    const ph = $('prestigeHistory');
+    if (ph) {
+      if (this.prestigeHistory.length === 0) {
+        ph.innerHTML = '<span class="text-sub">No prestige yet. Sail the Grand Line!</span>';
+      } else {
+        ph.innerHTML = this.prestigeHistory.slice(-5).reverse().map(h =>
+          `<div>Run ${h.run}: ${fmtBeli(h.beli)} collected, ${h.coins} D. Coins earned</div>`
+        ).join('');
+      }
+    }
+
+    const pbd = $('prestigeBonusDisplay');
+    if (pbd) {
+      const u = this.state.prestige.upgrades;
+      const lines = [];
+      if (u.belimult > 0)   lines.push(`💰 Beli gain: ×${Math.pow(1.5,u.belimult).toFixed(2)} (Rank ${u.belimult})`);
+      if (u.crewcap > 0)    lines.push(`🤝 Crew capacity: +${u.crewcap}`);
+      if (u.hakistart > 0)  lines.push(`🔮 Start with ${u.hakistart*5} Haki levels`);
+      if (u.startbeli > 0)  lines.push(`💎 Start Beli: ×${Math.pow(10,u.startbeli).toFixed(0)}`);
+      if (u.speedstart > 0) lines.push(`⚡ +${(u.speedstart*0.5).toFixed(1)} base battle speed`);
+      pbd.innerHTML = lines.length ? lines.join('<br>') : 'No bonuses yet.';
+    }
+  }
+
+  // ===== FULL RENDER (called once on init and on tab switch) =====
+  renderAll() {
+    this.renderCrew();
+    this.renderCrewUpgrades();
+    this.renderCombat();
+    this.renderShip();
+    this.renderHakiFull();
+    this.renderDevilFruits();
+    this.renderIslands();
+    this.renderDCoinUpgrades();
+  }
+
+  renderCrew() {
+    const roster = $('crewRoster');
+    if (!roster) return;
+    roster.innerHTML = '';
+    for (const cd of CREW_DATA) {
+      const cs = this.state.crew[cd.id] || { level:1, unlocked:false };
+      const unlocked = cs.unlocked;
+      const lvl = cs.level || 1;
+      const lvlCost = Math.floor(100 * Math.pow(1.15, lvl));
+      const canAfford = this.state.beli >= cd.unlockCost;
+      const div = document.createElement('div');
+      div.className = `crew-card ${unlocked ? '' : 'locked'}`;
+      div.innerHTML = `
+        <div class="crew-header">
+          <div class="crew-avatar">${cd.emoji}</div>
+          <div class="crew-info">
+            <div class="crew-name">${cd.name}</div>
+            <div class="crew-role">${cd.role}</div>
+            <div style="margin-top:3px;">${unlocked ? `<span class="chip green">ACTIVE</span>` : `<span class="chip red">LOCKED</span>`}</div>
+          </div>
+          ${unlocked ? `<div class="level-badge">Lv${lvl}</div>` : ''}
+        </div>
+        ${unlocked ? `
+          <div class="crew-stats">
+            <div class="stat">⚔️ ATK <strong>${fmt(cd.base.atk + cd.perLevel.atk*(lvl-1))}</strong></div>
+            <div class="stat">🛡️ DEF <strong>${fmt(cd.base.def + cd.perLevel.def*(lvl-1))}</strong></div>
+            <div class="stat">❤️ HP  <strong>${fmt(cd.base.hp  + cd.perLevel.hp *(lvl-1))}</strong></div>
+            <div class="stat">💫 <strong style="color:var(--teal);font-size:0.65rem;">${cd.passive}</strong></div>
+          </div>
+          <div class="progress-wrap mb-8"><div class="progress-bar xp" style="width:${(lvl%10)*10}%"></div></div>
+          <div class="flex-between">
+            <span class="small text-sub">Next Level: ${fmtBeli(lvlCost)}</span>
+            <button class="btn btn-gold btn-sm" onclick="game.levelUpCrew('${cd.id}')" ${this.state.beli>=lvlCost?'':'disabled'}>Level Up</button>
+          </div>
+        ` : `
+          <div class="small text-sub mb-8" style="line-height:1.5;">${cd.description}</div>
+          <button class="btn ${canAfford?'btn-gold':'btn-red'} btn-full" onclick="game.recruitCrew('${cd.id}')">
+            ${cd.unlockCost === 0 ? '✅ Recruit (Free!)' : `Recruit — ${fmtBeli(cd.unlockCost)}`}
+          </button>
+        `}
+      `;
+      roster.appendChild(div);
+    }
+  }
+
+  renderCrewUpgrades() {
+    const el = $('crewUpgrades');
+    if (!el) return;
+    el.innerHTML = '';
+    for (const u of CREW_UPGRADES) {
+      const curr = this.getUpgradeCount(u.id, this.state.crewUpgrades);
+      const cost = Math.floor(u.baseCost * Math.pow(u.costMult, curr));
+      const maxed = curr >= u.maxLevel;
+      const div = document.createElement('div');
+      div.className = 'upgrade-item';
+      div.innerHTML = `
+        <div class="upgrade-icon">${u.emoji}</div>
+        <div class="upgrade-text">
+          <div class="upgrade-name">${u.name}</div>
+          <div class="upgrade-desc">${u.desc}</div>
+          <div class="upgrade-cost">${maxed ? '✅ MAXED' : fmtBeli(cost)}</div>
+          <div class="upgrade-count">Level ${curr} / ${u.maxLevel}</div>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="game.buyCrewUpgrade('${u.id}')" ${maxed||this.state.beli<cost?'disabled':''}>
+          ${maxed ? '✅' : 'Buy'}
+        </button>
+      `;
+      el.appendChild(div);
+    }
+  }
+
+  renderCombat() {
+    // Update enemy info in header
+    if (this.currentEnemy) {
+      const ea = $('enemyAvatar'); if (ea) ea.textContent = this.currentEnemy.emoji;
+      const en = $('enemyName');   if (en) en.textContent = this.currentEnemy.name;
+    }
+    // Player avatar
+    const pa = $('playerAvatar');
+    if (pa) {
+      const luffy = this.state.crew['luffy'];
+      pa.textContent = luffy?.unlocked ? '🏴‍☠️' : '👤';
+    }
+
+    // Enemy list
+    const el = $('enemyList');
+    if (el) {
+      el.innerHTML = '';
+      const island = ISLANDS[this.state.islands.current] || ISLANDS[0];
+      const allEnemies = ENEMIES.filter(e => e.island <= this.state.islands.current + 1);
+      for (const e of allEnemies) {
+        const div = document.createElement('div');
+        const active = this.currentEnemy?.id === e.id;
+        div.className = `island-item ${active ? 'active-island' : ''}`;
+        div.onclick = () => this.setEnemy(e.id);
+        div.innerHTML = `
+          <div class="island-icon">${e.emoji}</div>
+          <div>
+            <div class="island-name">${e.name}</div>
+            <div class="island-desc">HP: ${fmt(e.hp)} | ATK: ${e.atk}</div>
+            <div class="island-reward">💰 ${fmtBeli(e.beli[0])}-${fmtBeli(e.beli[1])}</div>
+          </div>
+          ${active ? '<span class="chip">FIGHTING</span>' : ''}
+        `;
+        el.appendChild(div);
+      }
+    }
+
+    // Special attack buttons
+    const sab = $('specialAttackBtns');
+    if (sab) {
+      sab.innerHTML = '';
+      for (const cd of CREW_DATA) {
+        const cs = this.state.crew[cd.id];
+        if (!cs?.unlocked) continue;
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-blue btn-sm';
+        btn.textContent = `${cd.emoji} ${cd.ability}`;
+        btn.onclick = () => this.useSpecialAttack(cd.id);
+        sab.appendChild(btn);
+      }
+      if (sab.children.length === 0) {
+        sab.innerHTML = '<span class="small text-sub">Recruit crew to unlock special attacks!</span>';
+      }
+    }
+  }
+
+  renderShip() {
+    const ship = SHIP_TIERS[this.state.ship.tier] || SHIP_TIERS[0];
+    const se = $('shipEmoji'); if (se) se.textContent = ship.emoji;
+    const sn = $('shipName');  if (sn) sn.textContent = ship.name;
+    const sd = $('shipDesc');  if (sd) sd.textContent = ship.desc;
+    const ss = $('shipSpeed'); if (ss) ss.textContent = ship.speed + 'x';
+    const sc = $('shipCap');   if (sc) sc.textContent = ship.cap;
+    const sdf= $('shipDef');   if (sdf) sdf.textContent = '+' + ship.def + '%';
+
+    // Ship tier list
+    const stl = $('shipTierList');
+    if (stl) {
+      stl.innerHTML = '';
+      for (let i = 0; i < SHIP_TIERS.length; i++) {
+        const st = SHIP_TIERS[i];
+        const owned = i <= this.state.ship.tier;
+        const active = i === this.state.ship.tier;
+        const nextUp = i === this.state.ship.tier + 1;
+        const div = document.createElement('div');
+        div.className = `island-item ${active ? 'active-island' : ''}`;
+        div.innerHTML = `
+          <div class="island-icon">${st.emoji}</div>
+          <div style="flex:1">
+            <div class="island-name">${st.name}</div>
+            <div class="island-desc">Speed ${st.speed}x | Cap ${st.cap} | Def +${st.def}%</div>
+          </div>
+          ${owned ? '<span class="chip green">OWNED</span>' :
+            nextUp ? `<button class="btn btn-gold btn-sm" onclick="game.upgradeShipTier()">${fmtBeli(st.cost)}</button>` :
+            `<span class="chip">${fmtBeli(st.cost)}</span>`}
+        `;
+        stl.appendChild(div);
+      }
+    }
+
+    // Ship upgrades
+    const sul = $('shipUpgradeList');
+    if (sul) {
+      sul.innerHTML = '';
+      for (const u of SHIP_UPGRADES) {
+        const curr = this.getUpgradeCount(u.id, this.state.ship.upgrades);
+        const cost = Math.floor(u.baseCost * Math.pow(u.costMult, curr));
+        const maxed = curr >= u.maxLevel;
+        const div = document.createElement('div');
+        div.className = 'upgrade-item';
+        div.innerHTML = `
+          <div class="upgrade-icon">${u.emoji}</div>
+          <div class="upgrade-text">
+            <div class="upgrade-name">${u.name}</div>
+            <div class="upgrade-desc">${u.desc}</div>
+            <div class="upgrade-cost">${maxed ? '✅ MAXED' : fmtBeli(cost)}</div>
+            <div class="upgrade-count">Level ${curr} / ${u.maxLevel}</div>
+          </div>
+          <button class="btn btn-teal btn-sm" onclick="game.buyShipUpgrade('${u.id}')" ${maxed||this.state.beli<cost?'disabled':''}>
+            ${maxed ? '✅' : 'Buy'}
+          </button>
+        `;
+        sul.appendChild(div);
+      }
+    }
+
+    // Cargo info
+    const ci = $('cargoInfo');
+    if (ci) {
+      ci.innerHTML = `
+        <div>💰 Beli: <strong class="text-gold">${fmtBeli(this.state.beli)}</strong></div>
+        <div>💎 Treasure: <strong class="text-gold">${fmt(this.state.treasure)}</strong></div>
+        <div>⚡ Stamina: <strong class="text-green">${Math.floor(this.state.stamina)} / ${this.state.maxStamina}</strong></div>
+        <div>👥 Crew Members: <strong class="text-gold">${this.getUnlockedCrewCount()} / ${CREW_DATA.length}</strong></div>
+        <div>🏝️ Islands Cleared: <strong class="text-gold">${this.state.islands.cleared.length} / ${ISLANDS.length}</strong></div>
+      `;
+    }
+  }
+
+  renderHakiFull() {
+    // Haki upgrade sections
+    for (const type of ['conqueror','armament','observation']) {
+      const shortId = type === 'conqueror' ? 'conq' : type === 'armament' ? 'arm' : 'obs';
+      const upEl = $(`${shortId}Upgrades`);
+      if (!upEl) continue;
+      upEl.innerHTML = '';
+      for (const u of (HAKI_UPGRADES[type] || [])) {
+        const owned = !!this.state[`haki_${u.id}`];
+        const div = document.createElement('div');
+        div.className = 'upgrade-item';
+        div.style.padding = '8px 10px';
+        div.innerHTML = `
+          <div class="upgrade-text">
+            <div class="upgrade-name" style="font-size:0.78rem">${u.name}</div>
+            <div class="upgrade-desc">${u.effect}</div>
+            <div class="upgrade-cost">${owned ? '✅ Owned' : fmtBeli(u.cost)}</div>
+          </div>
+          ${!owned ? `<button class="btn btn-purple btn-sm" onclick="game.buyHakiUpgrade('${type}','${u.id}')" ${this.state.beli>=u.cost?'':'disabled'}>Buy</button>` : ''}
+        `;
+        upEl.appendChild(div);
+      }
+    }
+
+    // Haki training upgrades
+    const htu = $('hakiTrainingUpgrades');
+    if (htu) {
+      htu.innerHTML = '';
+      for (const u of HAKI_TRAINING_UPGRADES) {
+        if (!this.state.haki.training) this.state.haki.training = {};
+        const curr = this.getUpgradeCount(u.id, this.state.haki.training);
+        const cost = Math.floor(u.baseCost * Math.pow(u.costMult, curr));
+        const maxed = curr >= u.maxLevel;
+        const div = document.createElement('div');
+        div.className = 'upgrade-item';
+        div.innerHTML = `
+          <div class="upgrade-icon">${u.emoji}</div>
+          <div class="upgrade-text">
+            <div class="upgrade-name">${u.name}</div>
+            <div class="upgrade-desc">${u.desc}</div>
+            <div class="upgrade-cost">${maxed ? '✅ MAXED' : fmtBeli(cost)}</div>
+            <div class="upgrade-count">Level ${curr} / ${u.maxLevel}</div>
+          </div>
+          <button class="btn btn-purple btn-sm" onclick="game.buyHakiTraining('${u.id}')" ${maxed||this.state.beli<cost?'disabled':''}>
+            ${maxed ? '✅' : 'Buy'}
+          </button>
+        `;
+        htu.appendChild(div);
+      }
+    }
+  }
+
+  renderDevilFruits() {
+    const grid = $('devilFruitGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const equipped = this.state.devilFruit.equipped;
+    for (const df of DEVIL_FRUITS) {
+      const owned = this.state.devilFruit.owned.includes(df.id);
+      const active = equipped === df.id;
+      const canAfford = this.state.beli >= df.cost;
+      const div = document.createElement('div');
+      div.className = `df-card ${df.type} ${owned ? 'owned' : 'locked'}`;
+      div.onclick = () => this.eatDevilFruit(df.id);
+      div.innerHTML = `
+        ${active ? '<div style="position:absolute;top:8px;right:8px;font-size:1.2rem;">✅</div>' : ''}
+        <span class="df-fruit-icon">${df.emoji}</span>
+        <div class="df-name">${df.name}</div>
+        <div><span class="df-type-badge ${df.type}">${df.type.toUpperCase()}</span></div>
+        <div class="df-effect">${df.effect}</div>
+        <div class="df-cost">${owned ? (active ? 'EQUIPPED' : 'SWAP IN — Free') : fmtBeli(df.cost)}</div>
+      `;
+      grid.appendChild(div);
+    }
+
+    const eqEl = $('dfEquippedName');
+    if (eqEl) {
+      const df = this.getEquippedDF();
+      eqEl.textContent = df ? `${df.emoji} ${df.name} (${df.type})` : 'None — Eat a Devil Fruit below!';
+    }
+  }
+
+  renderIslands() {
+    const list = $('islandList');
+    if (!list) return;
+    list.innerHTML = '';
+    for (let i = 0; i < ISLANDS.length; i++) {
+      const isl = ISLANDS[i];
+      const unlocked = this.state.bounty >= isl.unlockBounty || i === 0;
+      const active = this.state.islands.current === i;
+      const cleared = this.state.islands.cleared.includes(isl.id);
+      const div = document.createElement('div');
+      div.className = `island-item ${active ? 'active-island' : ''} ${unlocked ? '' : 'locked'}`;
+      div.onclick = () => unlocked && this.setActiveIsland(i);
+      div.innerHTML = `
+        <div class="island-icon">${isl.emoji}</div>
+        <div style="flex:1">
+          <div class="island-name">${isl.name} ${cleared ? '✅' : ''}</div>
+          <div class="island-desc">${isl.desc}</div>
+          <div class="island-reward">Need Bounty: ${fmtBeli(isl.unlockBounty)}</div>
+        </div>
+        ${active ? '<span class="chip">CURRENT</span>' : unlocked ? '' : '<span class="chip red">LOCKED</span>'}
+      `;
+      list.appendChild(div);
+    }
+
+    // Island detail
+    const island = ISLANDS[this.state.islands.current];
+    const detail = $('islandDetail');
+    if (detail && island) {
+      detail.innerHTML = `
+        <div class="text-center mb-12" style="font-size:3.5rem">${island.emoji}</div>
+        <div style="font-family:var(--font-title);color:var(--gold);font-size:0.9rem;margin-bottom:6px;">${island.name}</div>
+        <div class="small text-sub mb-12">${island.desc}</div>
+        <div class="small mb-8">⚔️ Enemies: ${island.enemyIds.map(id => {
+          const e = ENEMIES.find(en => en.id === id);
+          return e ? `${e.emoji} ${e.name}` : id;
+        }).join(', ')}</div>
+        <div class="small mb-8">💰 Clear Reward: ${fmtBeli(island.rewardBeli)}</div>
+        <div class="small">💎 Treasure: +${island.rewardTreasure}</div>
+      `;
+    }
+  }
+
+  renderDCoinUpgrades() {
+    const el = $('dCoinUpgrades');
+    if (!el) return;
+    el.innerHTML = '';
+    for (const u of DCOIN_UPGRADES) {
+      const curr = this.state.prestige.upgrades[u.id] || 0;
+      const maxed = curr >= u.maxRank;
+      const div = document.createElement('div');
+      div.className = 'upgrade-item';
+      div.innerHTML = `
+        <div class="upgrade-icon">${u.emoji}</div>
+        <div class="upgrade-text">
+          <div class="upgrade-name">${u.name}</div>
+          <div class="upgrade-desc">${u.desc}</div>
+          <div class="upgrade-cost">${maxed ? '✅ MAXED' : `${u.cost} 🪙`}</div>
+          <div class="upgrade-count">Rank ${curr} / ${u.maxRank}</div>
+        </div>
+        <button class="btn btn-purple btn-sm" onclick="game.buyDCoinUpgrade('${u.id}')" ${maxed||this.state.prestige.dCoins<u.cost?'disabled':''}>
+          ${maxed ? '✅' : 'Buy'}
+        </button>
+      `;
+      el.appendChild(div);
+    }
+  }
+}
+
+// ============================================================
+// TAB NAVIGATION
+// ============================================================
+let activeTab = 'crew';
+const tabBtns = document.querySelectorAll('.tab-btn');
+tabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    tabBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('tab-' + tab);
+    if (panel) panel.classList.add('active');
+    activeTab = tab;
+    // Trigger tab-specific renders
+    if (tab === 'crew')        { game.renderCrew(); game.renderCrewUpgrades(); }
+    if (tab === 'combat')      game.renderCombat();
+    if (tab === 'ship')        game.renderShip();
+    if (tab === 'haki')        game.renderHakiFull();
+    if (tab === 'devilfruits') game.renderDevilFruits();
+    if (tab === 'islands')     game.renderIslands();
+    if (tab === 'prestige')    { game.renderDCoinUpgrades(); game.renderPrestige(); }
+  });
+});
+
+// ============================================================
+// BOOT
+// ============================================================
+const game = new Game();
+// Initial full render
+game.renderAll();
+
+// Auto-recruit Luffy (free)
+if (!game.state.crew['luffy']?.unlocked) {
+  game.recruitCrew('luffy');
+}
+
+// Periodic partial re-renders for active tab
+setInterval(() => {
+  if (activeTab === 'crew')        { game.renderCrew(); game.renderCrewUpgrades(); }
+  if (activeTab === 'combat')      game.renderCombat();
+  if (activeTab === 'ship')        game.renderShip();
+  if (activeTab === 'haki')        game.renderHakiFull();
+  if (activeTab === 'devilfruits') game.renderDevilFruits();
+  if (activeTab === 'islands')     game.renderIslands();
+  if (activeTab === 'prestige')    { game.renderDCoinUpgrades(); game.renderPrestige(); }
+}, 2000);
 </script>
 </body>
 </html>
